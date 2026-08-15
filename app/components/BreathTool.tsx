@@ -19,28 +19,31 @@ export function BreathTool({ onComplete }: BreathToolProps) {
 
   useEffect(() => {
     if (!running) return;
-    const timer = window.setInterval(() => {
-      setRemaining((current) => {
-        if (current > 1) return current - 1;
-        const nextPhase = (phase + 1) % PHASES.length;
-        if (nextPhase === 0) {
-          const nextCycle = cycles + 1;
-          if (nextCycle >= 3) {
-            setRunning(false);
-            setCycles(0);
-            setPhase(0);
-            setCompleted(true);
-            onComplete();
-            return PHASES[0].seconds;
-          }
-          setCycles(nextCycle);
+    const timer = window.setTimeout(() => {
+      if (remaining > 1) {
+        setRemaining(remaining - 1);
+        return;
+      }
+
+      const nextPhase = (phase + 1) % PHASES.length;
+      if (nextPhase === 0) {
+        const nextCycle = cycles + 1;
+        if (nextCycle >= 3) {
+          setRunning(false);
+          setCycles(0);
+          setPhase(0);
+          setRemaining(PHASES[0].seconds);
+          setCompleted(true);
+          onComplete();
+          return;
         }
-        setPhase(nextPhase);
-        return PHASES[nextPhase].seconds;
-      });
+        setCycles(nextCycle);
+      }
+      setPhase(nextPhase);
+      setRemaining(PHASES[nextPhase].seconds);
     }, 1000);
-    return () => window.clearInterval(timer);
-  }, [cycles, onComplete, phase, running]);
+    return () => window.clearTimeout(timer);
+  }, [cycles, onComplete, phase, remaining, running]);
 
   const current = PHASES[phase];
 
