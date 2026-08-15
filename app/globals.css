@@ -149,7 +149,7 @@ h1 em {
   text-transform: uppercase;
   letter-spacing: .06em;
 }
-.primary-button:hover, .primary-button:focus-visible { transform: translateY(-3px); background: var(--signal); }
+.primary-button:hover, .primary-button:focus-visible { transform: translateY(-3px); background: var(--signal); color: var(--ink); }
 .text-link { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .privacy-note { margin: 1.15rem 0 0; color: #66665d; font: 400 .68rem/1.4 var(--font-mono), monospace; }
 
@@ -222,7 +222,7 @@ h1 em {
 .duration:hover, .duration:focus-visible, .duration.active { border-color: var(--ink); background: var(--ink); color: white; }
 .timer-actions { display: grid; grid-template-columns: 1fr 48px; gap: .6rem; }
 .start-button { width: 100%; display: flex; justify-content: space-between; padding: 1.1rem 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
-.start-button:hover, .start-button:focus-visible { background: var(--signal); }
+.start-button:hover, .start-button:focus-visible { background: var(--signal); color: var(--ink); }
 .reset-button { min-width: 48px; border: 1px solid var(--ink); background: transparent; font-size: 1.2rem; cursor: pointer; }
 .reset-button:hover, .reset-button:focus-visible { background: var(--acid); }
 .stage-caption { position: absolute; right: 2rem; bottom: 1.4rem; margin: 0; font: 500 .63rem/1 var(--font-mono), monospace; letter-spacing: .1em; text-transform: uppercase; }
