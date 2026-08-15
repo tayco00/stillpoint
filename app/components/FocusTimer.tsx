@@ -52,14 +52,6 @@ export function FocusTimer({
     return () => window.clearInterval(timer);
   }, [duration, isRunning, onComplete]);
 
-  useEffect(() => {
-    const defaultTitle = "Stillpoint — Fokus, der sich gut anfühlt";
-    document.title = isRunning ? `${formatTime(remaining)} · Stillpoint` : defaultTitle;
-    return () => {
-      document.title = defaultTitle;
-    };
-  }, [isRunning, remaining]);
-
   const selectDuration = (minutes: (typeof PRESETS)[number]) => {
     setDuration(minutes);
     setRemaining(minutes * 60);
