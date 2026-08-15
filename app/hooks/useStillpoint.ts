@@ -11,7 +11,6 @@ import {
   readPersistedStateFrom,
   type ReminderPreferences,
   reviewLatestSession,
-  type SoundscapePreferences,
   STORAGE_KEY,
   type StillpointState,
   writePersistedStateTo,
@@ -121,10 +120,6 @@ export function useStillpoint() {
     setData((current) => ({ ...current, reminder }));
   }, []);
 
-  const setSoundscape = useCallback((soundscape: SoundscapePreferences) => {
-    setData((current) => ({ ...current, soundscape }));
-  }, []);
-
   const clearData = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -150,7 +145,6 @@ export function useStillpoint() {
     removeNote,
     setReflection,
     setReminder,
-    setSoundscape,
     clearData,
     storageAvailable,
   };

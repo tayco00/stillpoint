@@ -1,0 +1,202 @@
+.header-controls {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+
+.settings-trigger {
+  min-height: 44px;
+  padding: .7rem .85rem;
+  border: 1px solid rgba(23, 23, 20, .55);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: .68rem;
+  font-weight: 750;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.settings-trigger:hover,
+.settings-trigger:focus-visible {
+  background: var(--ink);
+  color: white;
+}
+
+.settings-dialog {
+  width: min(calc(100% - 2rem), 680px);
+  max-width: none;
+  max-height: min(820px, calc(100svh - 2rem));
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+  color: var(--ink);
+  box-shadow: 14px 14px 0 var(--acid);
+}
+
+.settings-dialog::backdrop {
+  background: rgba(23, 23, 20, .74);
+  backdrop-filter: blur(8px);
+}
+
+.settings-panel {
+  padding: clamp(1.4rem, 5vw, 3.2rem);
+}
+
+.settings-heading {
+  min-height: 0;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0;
+  border: 0;
+}
+
+.settings-heading p,
+.settings-section-copy > p {
+  margin: 0 0 .7rem;
+  color: var(--signal-ink);
+  font: 600 .66rem/1 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.settings-heading h2 {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: .92;
+  letter-spacing: -.06em;
+}
+
+.settings-heading > button {
+  min-width: 48px;
+  min-height: 48px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.settings-heading > button:hover,
+.settings-heading > button:focus-visible {
+  background: var(--signal);
+}
+
+.settings-description {
+  max-width: 32rem;
+  margin: 1.2rem 0 2.3rem;
+  color: #56564f;
+  line-height: 1.6;
+}
+
+.settings-reminder {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid rgba(23, 23, 20, .65);
+  background: #d8e4d7;
+}
+
+.settings-section-copy h3 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.settings-section-copy > span {
+  display: block;
+  max-width: 34rem;
+  margin-top: .8rem;
+  color: #4f4f49;
+  line-height: 1.55;
+}
+
+.settings-switch {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.8rem 0 1.5rem;
+  padding: .8rem 1rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 750;
+  text-align: left;
+}
+
+.settings-switch > span {
+  width: 50px;
+  height: 28px;
+  flex: 0 0 auto;
+  padding: 3px;
+  border: 1px solid var(--ink);
+  border-radius: 20px;
+  background: rgba(23, 23, 20, .08);
+}
+
+.settings-switch i {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform .2s ease, background-color .2s ease;
+}
+
+.settings-switch.active > span { background: var(--ink); }
+.settings-switch.active i { transform: translateX(20px); background: var(--acid); }
+.settings-switch:hover, .settings-switch:focus-visible { background: var(--paper-bright); }
+
+.settings-reminder fieldset { margin: 0; padding: 0; border: 0; }
+.settings-reminder fieldset:disabled { opacity: .45; }
+.settings-reminder legend { margin-bottom: .8rem; font: 600 .66rem/1 var(--font-mono), monospace; letter-spacing: .08em; text-transform: uppercase; }
+.settings-options { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid rgba(23, 23, 20, .58); }
+.settings-options label { position: relative; min-height: 62px; display: grid; place-items: center; border-right: 1px solid rgba(23, 23, 20, .58); cursor: pointer; }
+.settings-options label:last-child { border-right: 0; }
+.settings-options input { position: absolute; opacity: 0; }
+.settings-options span { font: 600 .7rem/1 var(--font-mono), monospace; }
+.settings-options label:has(input:checked) { background: var(--ink); color: white; }
+.settings-options label:has(input:focus-visible) { outline: 3px solid white; outline-offset: 3px; box-shadow: 0 0 0 6px var(--ink); }
+.settings-note { margin: 1.2rem 0 0; color: #56564f; font: 500 .68rem/1.55 var(--font-mono), monospace; }
+
+.settings-done {
+  min-height: 48px;
+  min-width: 120px;
+  margin-top: 1.2rem;
+  padding: .8rem 1rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.settings-done:hover,
+.settings-done:focus-visible {
+  background: var(--signal);
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .header-controls { gap: .55rem; }
+}
+
+@media (max-width: 560px) {
+  .header-controls .header-action { display: none; }
+  .settings-trigger { padding-inline: .7rem; font-size: .62rem; }
+  .settings-dialog { box-shadow: 7px 7px 0 var(--acid); }
+  .settings-panel { padding: 1.35rem; }
+  .settings-description { margin-bottom: 1.5rem; }
+  .settings-options { grid-template-columns: 1fr 1fr; }
+  .settings-options label:nth-child(2) { border-right: 0; }
+  .settings-options label:nth-child(-n + 2) { border-bottom: 1px solid rgba(23, 23, 20, .58); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-switch i { transition: none; }
+}

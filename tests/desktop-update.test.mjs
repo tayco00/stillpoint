@@ -14,6 +14,18 @@ const onboarding = await readFile(
   new URL("../app/components/FirstRunOnboarding.tsx", import.meta.url),
   "utf8",
 );
+const desktopSettings = await readFile(
+  new URL("../app/components/DesktopSettings.tsx", import.meta.url),
+  "utf8",
+);
+const interactiveTools = await readFile(
+  new URL("../app/components/InteractiveTools.tsx", import.meta.url),
+  "utf8",
+);
+const stillpointState = await readFile(
+  new URL("../app/lib/stillpoint.ts", import.meta.url),
+  "utf8",
+);
 const startupHtml = await readFile(
   new URL("../desktop/startup.html", import.meta.url),
   "utf8",
@@ -24,7 +36,7 @@ const startupRenderer = await readFile(
 );
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.3.2");
+  assert.equal(packageJson.version, "0.3.3");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -52,7 +64,7 @@ test("keeps the personal greeting concise and rotates neutral example names", ()
   assert.ok(!names.includes("Taylan"));
 });
 
-test("keeps quick capture and gentle reminders in the desktop shell", () => {
+test("keeps quick capture and settings-based reminders in the desktop shell", () => {
   assert.match(desktopMain, /new Tray\(/);
   assert.match(desktopMain, /CommandOrControl\+Shift\+Space/);
   assert.match(desktopMain, /stillpoint:\/\/app\/index\.html#quick-capture/);
@@ -60,6 +72,16 @@ test("keeps quick capture and gentle reminders in the desktop shell", () => {
   assert.match(desktopMain, /setInterval\(showFocusReminder/);
   assert.match(desktopMain, /--shell-smoke-test/);
   assert.match(preload, /stillpoint:reminder-preferences/);
+  assert.match(desktopSettings, /Einstellungen/);
+  assert.match(desktopSettings, /Sanfte Erinnerung/);
+  assert.match(desktopSettings, /role="switch"/);
+  assert.doesNotMatch(interactiveTools, /ReminderTool|Sanfte Erinnerung/);
+});
+
+test("removes offline soundscapes from UI and persisted state", () => {
+  assert.doesNotMatch(interactiveTools, /Soundscape|soundscape|Klangraum/);
+  assert.doesNotMatch(desktopSettings, /Soundscape|soundscape|Klangraum/);
+  assert.doesNotMatch(stillpointState, /Soundscape|soundscape/);
 });
 
 test("checks for updates only in packaged, non-smoke-test builds", () => {

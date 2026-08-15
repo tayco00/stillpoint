@@ -1,11 +1,13 @@
 import { FocusWorkspace } from "./FocusWorkspace";
 import { FirstRunOnboarding, PersonalHeroIntro } from "./FirstRunOnboarding";
 import { InteractiveTools } from "./InteractiveTools";
+import { DesktopSettings } from "./DesktopSettings";
 import { ResumeCard } from "./SessionContinuity";
 import { StillpointClient } from "./StillpointClient";
 import continuity from "../continuity.css?raw";
 import onboarding from "../onboarding.css?raw";
 import rhythm from "../rhythm.css?raw";
+import settings from "../settings.css?raw";
 import toolkit from "../toolkit.css?raw";
 
 const MARQUEE_ITEMS = ["KLARHEIT", "FOKUS", "FORTSCHRITT", "PAUSE", "KLARHEIT", "FOKUS"];
@@ -22,7 +24,10 @@ export function StillpointApp({ desktop = false }: { desktop?: boolean }) {
             <a href="#tools">Werkzeuge</a>
             <a href="#rhythm">Dein Rhythmus</a>
           </nav>
-          <a className="header-action" href="#workspace">Jetzt fokussieren <span aria-hidden="true">→</span></a>
+          <div className="header-controls">
+            <a className="header-action" href="#workspace">Jetzt fokussieren <span aria-hidden="true">→</span></a>
+            {desktop ? <DesktopSettings /> : null}
+          </div>
         </header>
 
         <section className="hero" id="top">
@@ -52,9 +57,9 @@ export function StillpointApp({ desktop = false }: { desktop?: boolean }) {
           </div>
         </div>
 
-        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}\n${onboarding}\n${continuity}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}\n${onboarding}\n${continuity}\n${settings}` }} />
 
-        <InteractiveTools desktop={desktop} />
+        <InteractiveTools />
 
         <section className="closing" aria-labelledby="closing-title">
           <h2 id="closing-title">Nicht mehr Zeit.<br /><em>Mehr Anwesenheit.</em></h2>

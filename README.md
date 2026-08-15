@@ -44,8 +44,8 @@ Menschen möglichst lange in der Anwendung halten sollen.
 - Parkplatz für ablenkende Gedanken
 - Schnellnotiz aus dem Windows-Infobereich oder mit
   `Strg + Umschalt + Leertaste`
-- Offline erzeugte Klangräume: Regen, tiefe Ruhe und weicher Raum
 - Einstellbare, ruhige Windows-Erinnerungen nach 30, 60, 90 oder 120 Minuten
+  im Bereich **Einstellungen**
 
 ### Rückblick
 
@@ -108,7 +108,6 @@ Zum vollständigen Beenden:
 - Keine Übertragung von Aktivitätsdaten an einen Server
 - Keine Cloud-Synchronisierung
 - Notizen, Einstellungen und Fortschritt bleiben auf dem jeweiligen Gerät
-- Klangräume werden lokal erzeugt und nicht gestreamt
 
 Die Daten werden nicht automatisch zwischen mehreren Computern übertragen.
 Über **Lokale Daten löschen** im Bereich „Dein Rhythmus“ kann der gespeicherte

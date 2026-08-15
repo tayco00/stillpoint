@@ -97,13 +97,13 @@ test("weekly review finds the strongest local focus pattern", () => {
   assert.equal(summary.energyLabel, "Stabile Energie");
 });
 
-test("desktop preferences are normalized to safe local values", () => {
+test("desktop reminder preferences are normalized to safe local values", () => {
   const normalized = normalizeState({
     reminder: { enabled: true, intervalMinutes: 999 },
     soundscape: { kind: "invalid", volume: 500 },
   });
   assert.deepEqual(normalized.reminder, { enabled: true, intervalMinutes: 60 });
-  assert.deepEqual(normalized.soundscape, { kind: "rain", volume: 100 });
+  assert.equal("soundscape" in normalized, false);
 });
 
 test("unavailable and quota-full storage fail safely", () => {

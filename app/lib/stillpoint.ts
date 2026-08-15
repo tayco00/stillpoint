@@ -27,16 +27,10 @@ export type SessionRecord = {
 };
 
 export type ReminderInterval = 30 | 60 | 90 | 120;
-export type SoundscapeKind = "rain" | "brown" | "room";
 
 export type ReminderPreferences = {
   enabled: boolean;
   intervalMinutes: ReminderInterval;
-};
-
-export type SoundscapePreferences = {
-  kind: SoundscapeKind;
-  volume: number;
 };
 
 export type StillpointState = {
@@ -51,7 +45,6 @@ export type StillpointState = {
   lastEnergy: EnergyLevel | null;
   preferredDuration: 25 | 45 | 60;
   reminder: ReminderPreferences;
-  soundscape: SoundscapePreferences;
 };
 
 export type WeeklySummary = {
@@ -87,7 +80,6 @@ export function createDefaultState(): StillpointState {
     lastEnergy: null,
     preferredDuration: 25,
     reminder: { enabled: false, intervalMinutes: 60 },
-    soundscape: { kind: "rain", volume: 35 },
   };
 }
 
@@ -169,13 +161,9 @@ export function normalizeState(value: unknown): StillpointState {
     ? (candidate.lastEnergy as EnergyLevel)
     : null;
   const reminder = candidate.reminder;
-  const soundscape = candidate.soundscape;
   const reminderInterval = [30, 60, 90, 120].includes(reminder?.intervalMinutes ?? 0)
     ? (reminder?.intervalMinutes as ReminderInterval)
     : fallback.reminder.intervalMinutes;
-  const soundscapeKind = ["rain", "brown", "room"].includes(soundscape?.kind ?? "")
-    ? (soundscape?.kind as SoundscapeKind)
-    : fallback.soundscape.kind;
 
   return {
     version: STATE_VERSION,
@@ -199,13 +187,6 @@ export function normalizeState(value: unknown): StillpointState {
     reminder: {
       enabled: reminder?.enabled === true,
       intervalMinutes: reminderInterval,
-    },
-    soundscape: {
-      kind: soundscapeKind,
-      volume:
-        typeof soundscape?.volume === "number" && Number.isFinite(soundscape.volume)
-          ? Math.min(100, Math.max(0, Math.round(soundscape.volume)))
-          : fallback.soundscape.volume,
     },
   };
 }
