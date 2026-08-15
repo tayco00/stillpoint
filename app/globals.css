@@ -151,8 +151,6 @@ h1 em {
 }
 .primary-button:hover, .primary-button:focus-visible { transform: translateY(-3px); background: var(--signal); color: var(--ink); }
 .text-link { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
-.privacy-note { margin: 1.15rem 0 0; color: #66665d; font: 400 .68rem/1.4 var(--font-mono), monospace; }
-
 .timer-stage {
   position: relative;
   min-height: 650px;
@@ -229,9 +227,21 @@ h1 em {
 .stage-caption span { color: var(--signal-ink); margin-right: .7rem; }
 
 .marquee { overflow: hidden; border-block: 1px solid var(--ink); background: var(--acid); }
-.marquee div { width: max-content; padding: .85rem 0; font-weight: 800; letter-spacing: .04em; animation: marquee 20s linear infinite; }
-.marquee span { padding: 0 1.2rem; color: var(--signal); }
-@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee-track { display: flex; width: max-content; animation: marquee 24s linear infinite; will-change: transform; }
+.marquee-group {
+  flex: none;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1.75rem;
+  padding: .85rem 1.5rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.marquee-item { display: inline-flex; align-items: center; gap: 1.75rem; white-space: nowrap; }
+.marquee-item::after { content: "✦"; color: var(--signal); }
+@keyframes marquee { to { transform: translate3d(-50%, 0, 0); } }
 
 :focus-visible {
   outline: 3px solid white;
@@ -269,5 +279,6 @@ h1 em {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   [data-reveal] { opacity: 1; transform: none; }
+  .marquee-track { animation: none !important; transform: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

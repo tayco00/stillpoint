@@ -4,6 +4,8 @@ import { StillpointClient } from "./StillpointClient";
 import rhythm from "../rhythm.css?raw";
 import toolkit from "../toolkit.css?raw";
 
+const MARQUEE_ITEMS = ["KLARHEIT", "FOKUS", "FORTSCHRITT", "PAUSE", "KLARHEIT", "FOKUS"];
+
 export function StillpointApp() {
   return (
     <StillpointClient>
@@ -21,7 +23,6 @@ export function StillpointApp() {
 
         <section className="hero" id="top">
           <div className="hero-copy">
-            <p className="eyebrow"><span /> Ein ruhiger Ort für wichtige Arbeit</p>
             <h1>Weniger<br />vorhaben. <em>Mehr</em><br />bewegen.</h1>
             <p className="hero-intro">
               Fokus, Energie und Fortschritt an einem Ort. Kostenlos, lokal gespeichert
@@ -31,13 +32,22 @@ export function StillpointApp() {
               <a className="primary-button" href="#workspace">Fokus starten <span aria-hidden="true">→</span></a>
               <a className="text-link" href="#tools">Erst umsehen <span aria-hidden="true">↓</span></a>
             </div>
-            <p className="privacy-note">Keine Anmeldung · Deine Daten bleiben auf diesem Gerät</p>
           </div>
           <FocusWorkspace />
         </section>
 
         <div className="marquee" aria-hidden="true">
-          <div>KLARHEIT <span>✦</span> FOKUS <span>✦</span> FORTSCHRITT <span>✦</span> PAUSE <span>✦</span> KLARHEIT <span>✦</span> FOKUS <span>✦</span></div>
+          <div className="marquee-track">
+            {[0, 1].map((copy) => (
+              <div className="marquee-group" key={copy}>
+                {MARQUEE_ITEMS.map((item, index) => (
+                  <span className="marquee-item" key={`${copy}-${item}-${index}`}>
+                    <strong>{item}</strong>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}` }} />

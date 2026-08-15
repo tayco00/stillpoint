@@ -1151,132 +1151,6 @@
             }
           ],
           "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".marquee > div > span:nth-child(1)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".marquee > div > span:nth-child(2)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".marquee > div > span:nth-child(3)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".marquee > div > span:nth-child(4)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            "span:nth-child(5)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
-          "html": "<span>✦</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            "span:nth-child(6)"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "messageKey": "nonBmp"
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element content contains only non-text characters",
-              "relatedNodes": []
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
           "html": "<span aria-hidden=\"true\">↑</span>",
           "impact": "serious",
           "none": [],
@@ -3082,7 +2956,7 @@
             }
           ],
           "any": [],
-          "html": "<div class=\"marquee\" aria-hidden=\"true\"><div>KLARHEIT <span>✦</span> FOKUS <span>✦</span> FORTSCHRITT <span>✦</span> PAUSE <span>✦</span> KLARHEIT <span>✦</span> FOKUS <span>✦</span></div></div>",
+          "html": "<div class=\"marquee\" aria-hidden=\"true\">",
           "impact": null,
           "none": [],
           "target": [
@@ -6853,33 +6727,6 @@
               "data": {
                 "bgColor": "#f1f0e8",
                 "contrastRatio": 15.71,
-                "expectedContrastRatio": "4.5:1",
-                "fgColor": "#171714",
-                "fontSize": "8.2pt (10.88px)",
-                "fontWeight": "normal",
-                "messageKey": null,
-                "shadowColor": null
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element has sufficient color contrast of 15.71",
-              "relatedNodes": []
-            }
-          ],
-          "html": "<p class=\"eyebrow\"><span></span> Ein ruhiger Ort für wichtige Arbeit</p>",
-          "impact": null,
-          "none": [],
-          "target": [
-            ".hero-copy > .eyebrow"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "bgColor": "#f1f0e8",
-                "contrastRatio": 15.71,
                 "expectedContrastRatio": "3:1",
                 "fgColor": "#171714",
                 "fontSize": "40.8pt (54.4px)",
@@ -7013,26 +6860,26 @@
           "any": [
             {
               "data": {
-                "bgColor": "#f1f0e8",
-                "contrastRatio": 5.06,
+                "bgColor": "#d8ff4f",
+                "contrastRatio": 15.68,
                 "expectedContrastRatio": "4.5:1",
-                "fgColor": "#66665d",
-                "fontSize": "8.2pt (10.88px)",
-                "fontWeight": "normal",
+                "fgColor": "#171714",
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "bold",
                 "messageKey": null,
                 "shadowColor": null
               },
               "id": "color-contrast",
               "impact": "serious",
-              "message": "Element has sufficient color contrast of 5.06",
+              "message": "Element has sufficient color contrast of 15.68",
               "relatedNodes": []
             }
           ],
-          "html": "<p class=\"privacy-note\">Keine Anmeldung · Deine Daten bleiben auf diesem Gerät</p>",
+          "html": "<strong>KLARHEIT</strong>",
           "impact": null,
           "none": [],
           "target": [
-            ".privacy-note"
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(1) > strong"
           ]
         },
         {
@@ -7055,11 +6902,119 @@
               "relatedNodes": []
             }
           ],
-          "html": "<div>KLARHEIT <span>✦</span> FOKUS <span>✦</span> FORTSCHRITT <span>✦</span> PAUSE <span>✦</span> KLARHEIT <span>✦</span> FOKUS <span>✦</span></div>",
+          "html": "<strong>FOKUS</strong>",
           "impact": null,
           "none": [],
           "target": [
-            ".marquee > div"
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(2) > strong"
+          ]
+        },
+        {
+          "all": [],
+          "any": [
+            {
+              "data": {
+                "bgColor": "#d8ff4f",
+                "contrastRatio": 15.68,
+                "expectedContrastRatio": "4.5:1",
+                "fgColor": "#171714",
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "bold",
+                "messageKey": null,
+                "shadowColor": null
+              },
+              "id": "color-contrast",
+              "impact": "serious",
+              "message": "Element has sufficient color contrast of 15.68",
+              "relatedNodes": []
+            }
+          ],
+          "html": "<strong>FORTSCHRITT</strong>",
+          "impact": null,
+          "none": [],
+          "target": [
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(3) > strong"
+          ]
+        },
+        {
+          "all": [],
+          "any": [
+            {
+              "data": {
+                "bgColor": "#d8ff4f",
+                "contrastRatio": 15.68,
+                "expectedContrastRatio": "4.5:1",
+                "fgColor": "#171714",
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "bold",
+                "messageKey": null,
+                "shadowColor": null
+              },
+              "id": "color-contrast",
+              "impact": "serious",
+              "message": "Element has sufficient color contrast of 15.68",
+              "relatedNodes": []
+            }
+          ],
+          "html": "<strong>PAUSE</strong>",
+          "impact": null,
+          "none": [],
+          "target": [
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(4) > strong"
+          ]
+        },
+        {
+          "all": [],
+          "any": [
+            {
+              "data": {
+                "bgColor": "#d8ff4f",
+                "contrastRatio": 15.68,
+                "expectedContrastRatio": "4.5:1",
+                "fgColor": "#171714",
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "bold",
+                "messageKey": null,
+                "shadowColor": null
+              },
+              "id": "color-contrast",
+              "impact": "serious",
+              "message": "Element has sufficient color contrast of 15.68",
+              "relatedNodes": []
+            }
+          ],
+          "html": "<strong>KLARHEIT</strong>",
+          "impact": null,
+          "none": [],
+          "target": [
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(5) > strong"
+          ]
+        },
+        {
+          "all": [],
+          "any": [
+            {
+              "data": {
+                "bgColor": "#d8ff4f",
+                "contrastRatio": 15.68,
+                "expectedContrastRatio": "4.5:1",
+                "fgColor": "#171714",
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "bold",
+                "messageKey": null,
+                "shadowColor": null
+              },
+              "id": "color-contrast",
+              "impact": "serious",
+              "message": "Element has sufficient color contrast of 15.68",
+              "relatedNodes": []
+            }
+          ],
+          "html": "<strong>FOKUS</strong>",
+          "impact": null,
+          "none": [],
+          "target": [
+            ".marquee-group:nth-child(1) > .marquee-item:nth-child(6) > strong"
           ]
         },
         {
@@ -7207,7 +7162,7 @@
           "impact": null,
           "none": [],
           "target": [
-            ".closing > .eyebrow"
+            ".eyebrow"
           ]
         },
         {
@@ -9525,14 +9480,14 @@
   "testEnvironment": {
     "orientationAngle": 0,
     "orientationType": "landscape-primary",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
     "windowHeight": 429,
     "windowWidth": 764
   },
   "testRunner": {
     "name": "axe"
   },
-  "timestamp": "2026-08-15T08:55:59.019Z",
+  "timestamp": "2026-08-15T13:43:43.016Z",
   "toolOptions": {
     "reporter": "v1",
     "runOnly": {
@@ -9545,6 +9500,6 @@
       ]
     }
   },
-  "url": "http://localhost:3001/",
+  "url": "http://localhost:3000/",
   "violations": []
 }
