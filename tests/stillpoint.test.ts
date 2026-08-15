@@ -1,0 +1,101 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  addBreathReset,
+  addSession,
+  createDefaultState,
+  ENERGY_RECOMMENDATIONS,
+  formatTime,
+  getRecentDays,
+  localDateKey,
+  normalizeState,
+  readPersistedState,
+  timerSnapshot,
+  writePersistedState,
+} from "../app/lib/stillpoint.ts";
+
+test("timer formatting is stable at boundaries", () => {
+  assert.equal(formatTime(0), "00:00");
+  assert.equal(formatTime(65), "01:05");
+  assert.equal(formatTime(-10), "00:00");
+});
+
+test("wall-clock timer supports pause, resume, and exactly-once completion", () => {
+  const firstDeadline = 25_000;
+  const paused = timerSnapshot(firstDeadline, 5_250);
+  assert.deepEqual(paused, { remaining: 20, shouldComplete: false });
+
+  const resumedDeadline = 10_000 + paused.remaining * 1000;
+  assert.equal(timerSnapshot(resumedDeadline, 29_001).remaining, 1);
+  const completion = timerSnapshot(resumedDeadline, 30_000);
+  assert.deepEqual(completion, { remaining: 0, shouldComplete: true });
+  assert.deepEqual(timerSnapshot(resumedDeadline, 31_000, true), {
+    remaining: 0,
+    shouldComplete: false,
+  });
+});
+
+test("invalid stored data falls back safely and clamps user content", () => {
+  assert.deepEqual(normalizeState(null), createDefaultState());
+  const normalized = normalizeState({
+    intention: "x".repeat(300),
+    notes: [{ id: "1", text: "y".repeat(300), createdAt: 1 }, { broken: true }],
+    days: { "2026-08-15": { sessions: -4, minutes: 12.4, breaths: 2 } },
+    lastEnergy: "impossible",
+    preferredDuration: 90,
+  });
+  assert.equal(normalized.intention.length, 180);
+  assert.equal(normalized.notes.length, 1);
+  assert.equal(normalized.notes[0].text.length, 180);
+  assert.deepEqual(normalized.days["2026-08-15"], { sessions: 0, minutes: 12, breaths: 2 });
+  assert.equal(normalized.lastEnergy, null);
+  assert.equal(normalized.preferredDuration, 25);
+});
+
+test("the selected focus duration survives state normalization", () => {
+  assert.equal(normalizeState({ preferredDuration: 60 }).preferredDuration, 60);
+});
+
+test("unavailable and quota-full storage fail safely", () => {
+  const unreadable = readPersistedState({
+    getItem() {
+      throw new Error("blocked");
+    },
+  });
+  assert.equal(unreadable.available, false);
+  assert.deepEqual(unreadable.state, createDefaultState());
+
+  const saved = writePersistedState(
+    {
+      setItem() {
+        throw new Error("quota full");
+      },
+    },
+    createDefaultState(),
+  );
+  assert.equal(saved, false);
+});
+
+test("sessions and breath resets update only the selected local day", () => {
+  const date = new Date(2026, 7, 15, 12);
+  const withSession = addSession(createDefaultState(), 45, date);
+  const withReset = addBreathReset(withSession, date);
+  const key = localDateKey(date);
+  assert.deepEqual(withReset.days[key], { sessions: 1, minutes: 45, breaths: 1 });
+  assert.equal(Object.keys(withReset.days).length, 1);
+});
+
+test("energy recommendations map to the three supported focus lengths", () => {
+  assert.deepEqual(
+    Object.values(ENERGY_RECOMMENDATIONS).map((item) => item.duration),
+    [25, 45, 60],
+  );
+});
+
+test("recent history always returns seven ordered local days", () => {
+  const today = new Date(2026, 7, 15, 12);
+  const days = getRecentDays(createDefaultState(), 7, today);
+  assert.equal(days.length, 7);
+  assert.equal(days.at(-1)?.key, "2026-08-15");
+  assert.equal(days[0].key, "2026-08-09");
+});
