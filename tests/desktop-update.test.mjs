@@ -10,9 +10,13 @@ const desktopMain = await readFile(
   "utf8",
 );
 const preload = await readFile(new URL("../desktop/preload.cjs", import.meta.url), "utf8");
+const onboarding = await readFile(
+  new URL("../app/components/FirstRunOnboarding.tsx", import.meta.url),
+  "utf8",
+);
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.3.0");
+  assert.equal(packageJson.version, "0.3.1");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -24,6 +28,13 @@ test("ships an installable GitHub update channel", () => {
       releaseType: "release",
     },
   ]);
+});
+
+test("keeps the personal greeting concise and rotates neutral example names", () => {
+  assert.match(onboarding, /Schön, dass du da bist/);
+  assert.match(onboarding, /EXAMPLE_NAMES = \[/);
+  assert.match(onboarding, /setInterval/);
+  assert.doesNotMatch(onboarding, /Zum Beispiel Taylan/);
 });
 
 test("keeps quick capture and gentle reminders in the desktop shell", () => {

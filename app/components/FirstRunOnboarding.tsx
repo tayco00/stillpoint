@@ -3,13 +3,22 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useStillpointContext } from "./StillpointClient";
 
+const EXAMPLE_NAMES = ["Mia", "Elias", "Aylin", "Noah", "Samira", "Mika", "Leonie", "Amir"];
+
 export function PersonalHeroIntro({ enabled }: { enabled: boolean }) {
   const { data, ready } = useStillpointContext();
   const name = enabled && ready ? data.profileName : "";
 
+  if (enabled) {
+    return (
+      <p className="hero-intro" aria-live="polite">
+        {name ? <>Schön, dass du da bist, <strong>{name}</strong>.</> : null}
+      </p>
+    );
+  }
+
   return (
-    <p className="hero-intro" aria-live="polite">
-      {name ? <>Schön, dass du da bist, <strong>{name}</strong>. </> : null}
+    <p className="hero-intro">
       Fokus, Energie und Fortschritt an einem Ort. Kostenlos, lokal gespeichert
       und ohne den Lärm klassischer Produktivitäts-Apps.
     </p>
@@ -19,6 +28,7 @@ export function PersonalHeroIntro({ enabled }: { enabled: boolean }) {
 export function FirstRunOnboarding({ enabled }: { enabled: boolean }) {
   const { data, ready, setProfileName } = useStillpointContext();
   const [name, setName] = useState("");
+  const [exampleIndex, setExampleIndex] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const shouldOpen = enabled && ready && !data.profileName;
@@ -37,6 +47,14 @@ export function FirstRunOnboarding({ enabled }: { enabled: boolean }) {
       document.body.style.overflow = previousOverflow;
       if (dialog.open) dialog.close();
     };
+  }, [shouldOpen]);
+
+  useEffect(() => {
+    if (!shouldOpen) return;
+    const nameLoop = window.setInterval(() => {
+      setExampleIndex((current) => (current + 1) % EXAMPLE_NAMES.length);
+    }, 1800);
+    return () => window.clearInterval(nameLoop);
   }, [shouldOpen]);
 
   if (!shouldOpen) return null;
@@ -72,7 +90,7 @@ export function FirstRunOnboarding({ enabled }: { enabled: boolean }) {
           onChange={(event) => setName(event.target.value.slice(0, 40))}
           autoComplete="given-name"
           maxLength={40}
-          placeholder="Zum Beispiel Taylan"
+          placeholder={`Zum Beispiel ${EXAMPLE_NAMES[exampleIndex]}`}
           required
         />
 

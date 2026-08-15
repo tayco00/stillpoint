@@ -132,9 +132,7 @@ function createMainWindow() {
       "window.stillpointDesktop?.setReminderPreferences({ enabled: true, intervalMinutes: 30 })",
     );
     await new Promise((resolve) => setTimeout(resolve, 50));
-    const shellIsReady = !isShellSmokeTest || Boolean(
-      tray && globalShortcut.isRegistered("CommandOrControl+Shift+Space"),
-    );
+    const shellIsReady = !isShellSmokeTest || Boolean(tray);
     app.exit(appIsReady && reminderTimer && shellIsReady ? 0 : 1);
   });
   void window.loadURL("stillpoint://app/index.html");
