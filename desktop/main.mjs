@@ -68,8 +68,9 @@ function createWindow() {
       return;
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const appIsReady = await window.webContents.executeJavaScript(
-      "Boolean(document.querySelector('h1')?.textContent?.includes('Weniger') && document.querySelector('#workspace'))",
+      "Boolean(document.title === 'Stillpoint' && document.querySelector('h1')?.textContent?.includes('Weniger') && document.querySelector('#workspace'))",
     );
     app.exit(appIsReady ? 0 : 1);
   });
