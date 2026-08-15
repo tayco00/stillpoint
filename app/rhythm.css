@@ -74,7 +74,7 @@ footer {
   border-top: 1px solid var(--line);
 }
 footer p { margin: 0; text-align: center; font-size: .72rem; color: #686860; }
-footer > div { display: flex; justify-content: end; gap: 1.5rem; font: 500 .62rem/1 var(--font-mono), monospace; text-transform: uppercase; }
+footer > div { display: flex; justify-content: end; gap: 1.5rem; font: 500 .72rem/1.4 var(--font-mono), monospace; text-transform: uppercase; }
 footer a { text-decoration: none; }
 footer > div a:hover, footer > div a:focus-visible { color: var(--signal); }
 
