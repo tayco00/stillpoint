@@ -10,8 +10,10 @@ import {
   localDateKey,
   normalizeState,
   readPersistedState,
+  readPersistedStateFrom,
   timerSnapshot,
   writePersistedState,
+  writePersistedStateTo,
 } from "../app/lib/stillpoint.ts";
 
 test("timer formatting is stable at boundaries", () => {
@@ -74,6 +76,17 @@ test("unavailable and quota-full storage fail safely", () => {
     createDefaultState(),
   );
   assert.equal(saved, false);
+
+  const inaccessible = readPersistedStateFrom(() => {
+    throw new DOMException("Storage policy", "SecurityError");
+  });
+  assert.equal(inaccessible.available, false);
+  assert.equal(
+    writePersistedStateTo(() => {
+      throw new DOMException("Storage policy", "SecurityError");
+    }, createDefaultState()),
+    false,
+  );
 });
 
 test("sessions and breath resets update only the selected local day", () => {

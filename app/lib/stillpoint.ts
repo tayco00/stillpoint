@@ -131,10 +131,29 @@ export function readPersistedState(storage: ReadableStorage) {
   }
 }
 
+export function readPersistedStateFrom(getStorage: () => ReadableStorage) {
+  try {
+    return readPersistedState(getStorage());
+  } catch {
+    return { state: createDefaultState(), available: false };
+  }
+}
+
 export function writePersistedState(storage: WritableStorage, state: StillpointState) {
   try {
     storage.setItem(STORAGE_KEY, JSON.stringify(state));
     return true;
+  } catch {
+    return false;
+  }
+}
+
+export function writePersistedStateTo(
+  getStorage: () => WritableStorage,
+  state: StillpointState,
+) {
+  try {
+    return writePersistedState(getStorage(), state);
   } catch {
     return false;
   }

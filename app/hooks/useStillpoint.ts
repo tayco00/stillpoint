@@ -8,10 +8,10 @@ import {
   type EnergyLevel,
   localDateKey,
   MAX_NOTES,
-  readPersistedState,
+  readPersistedStateFrom,
   STORAGE_KEY,
   type StillpointState,
-  writePersistedState,
+  writePersistedStateTo,
 } from "../lib/stillpoint";
 
 export function useStillpoint() {
@@ -20,7 +20,7 @@ export function useStillpoint() {
   const [storageAvailable, setStorageAvailable] = useState(true);
 
   useEffect(() => {
-    const persisted = readPersistedState(window.localStorage);
+    const persisted = readPersistedStateFrom(() => window.localStorage);
     const hydration = window.setTimeout(() => {
       setData(persisted.state);
       setReady(true);
@@ -31,7 +31,7 @@ export function useStillpoint() {
 
   useEffect(() => {
     if (!ready) return;
-    const nextStorageAvailable = writePersistedState(window.localStorage, data);
+    const nextStorageAvailable = writePersistedStateTo(() => window.localStorage, data);
     const statusUpdate = window.setTimeout(
       () => setStorageAvailable(nextStorageAvailable),
       0,
