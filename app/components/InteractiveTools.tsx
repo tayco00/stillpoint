@@ -54,7 +54,6 @@ export function InteractiveTools() {
     <>
       <section className="tools-section" id="tools" aria-labelledby="tools-title">
         <div className="section-heading" data-reveal>
-          <p><span>02–04</span> Kleine Werkzeuge</p>
           <h2 id="tools-title">Für alles,<br />was <em>dazwischen</em> kommt.</h2>
           <p className="section-lede">Kein System, das du pflegen musst. Drei Dinge, die genau dann helfen, wenn Fokus allein nicht reicht.</p>
         </div>

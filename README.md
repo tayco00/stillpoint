@@ -5,7 +5,7 @@ accurate focus timer, guided breathing, an energy-based session recommendation,
 a distraction capture pad, local progress, and a daily reflection without
 accounts, analytics, or remote persistence.
 
-## Run locally
+## Develop locally
 
 ```bash
 npm install
@@ -14,17 +14,21 @@ npm run dev
 
 ## Windows desktop app
 
-Stillpoint also ships as a portable, offline-capable Windows application. The
-desktop and web targets render the same shared product surface and keep their
-data locally on the device.
+Stillpoint is distributed as an offline-capable Windows application. Its data
+stays locally on the device; there is no separate web release.
 
 ```bash
 npm run desktop:build
 npm run desktop:package
 ```
 
-The packaging command creates `desktop-release/Stillpoint.exe`. Generated
-desktop bundles and executables stay outside version control.
+The packaging command creates two choices:
+
+- `desktop-release/Stillpoint.exe` starts directly without installation.
+- `desktop-release/Stillpoint-Setup.exe` installs Stillpoint with optional
+  Desktop and Start-menu shortcuts.
+
+Generated desktop bundles and executables stay outside version control.
 
 ## Validate
 

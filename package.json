@@ -12,7 +12,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "desktop:build": "tsc --noEmit -p tsconfig.desktop.json && vite build --config desktop.vite.config.ts",
-    "desktop:package": "node scripts/generate-desktop-icon.mjs && npm run desktop:build && electron-builder --win portable --x64",
+    "desktop:package": "node scripts/generate-desktop-icon.mjs && npm run desktop:build && electron-builder --win --x64",
     "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/stillpoint.test.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern desktop-dist --ignore-pattern desktop-release --ignore-pattern .next",
     "audit:a11y": "node scripts/run-axe.mjs",
@@ -62,9 +62,24 @@
       "build/icon.png"
     ],
     "win": {
-      "target": "portable",
+      "target": [
+        "portable",
+        "nsis"
+      ],
       "icon": "build/icon.png",
       "artifactName": "Stillpoint.${ext}"
+    },
+    "portable": {
+      "artifactName": "Stillpoint.exe"
+    },
+    "nsis": {
+      "artifactName": "Stillpoint-Setup.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Stillpoint",
+      "uninstallDisplayName": "Stillpoint"
     }
   }
 }

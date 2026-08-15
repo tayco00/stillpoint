@@ -22,7 +22,6 @@ export function EnergyTool({ value, onChange, onUseDuration }: EnergyToolProps) 
 
   return (
     <article className="tool-card energy-card" data-reveal>
-      <div className="tool-index">03 / ENERGIE</div>
       <div className="tool-copy">
         <p className="tool-kicker">Ehrlich einchecken</p>
         <h3>Wie viel ist heute da?</h3>

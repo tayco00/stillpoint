@@ -29,6 +29,11 @@ test("server-renders the complete Stillpoint product surface", async () => {
   assert.match(html, /Fortschritt/);
   assert.doesNotMatch(html, /Ein ruhiger Ort für wichtige Arbeit/);
   assert.doesNotMatch(html, /Keine Anmeldung · Deine Daten bleiben auf diesem Gerät/);
+  assert.doesNotMatch(html, /Mach nur das\. Für jetzt\./);
+  assert.doesNotMatch(html, /Kleine Werkzeuge/);
+  assert.doesNotMatch(html, /02 \/ RESET|03 \/ ENERGIE|04 \/ PARKPLATZ/);
+  assert.doesNotMatch(html, /<span>05<\/span>\s*Dein Rhythmus/);
+  assert.doesNotMatch(html, /Der nächste gute Schritt/);
   assert.equal((html.match(/class="marquee-group"/g) ?? []).length, 2);
   assert.match(html, /application\/ld\+json/);
 });

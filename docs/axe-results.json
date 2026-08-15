@@ -1072,76 +1072,6 @@
           "any": [
             {
               "data": {
-                "bgColor": null,
-                "contrastRatio": 0,
-                "expectedContrastRatio": "4.5:1",
-                "fgColor": null,
-                "fontSize": "7.6pt (10.08px)",
-                "fontWeight": "normal",
-                "messageKey": "bgGradient",
-                "shadowColor": null
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element's background color could not be determined due to a background gradient",
-              "relatedNodes": [
-                {
-                  "html": "<div class=\"timer-stage\" id=\"workspace\">",
-                  "target": [
-                    "#workspace"
-                  ]
-                }
-              ]
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
-          "html": "<p class=\"stage-caption\"><span>01</span> Mach nur das. Für jetzt.</p>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".stage-caption"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "bgColor": null,
-                "contrastRatio": 0,
-                "expectedContrastRatio": "4.5:1",
-                "fgColor": null,
-                "fontSize": "7.6pt (10.08px)",
-                "fontWeight": "normal",
-                "messageKey": "bgGradient",
-                "shadowColor": null
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element's background color could not be determined due to a background gradient",
-              "relatedNodes": [
-                {
-                  "html": "<div class=\"timer-stage\" id=\"workspace\">",
-                  "target": [
-                    "#workspace"
-                  ]
-                }
-              ]
-            }
-          ],
-          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
-          "html": "<span>01</span>",
-          "impact": "serious",
-          "none": [],
-          "target": [
-            ".stage-caption > span"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
                 "messageKey": "nonBmp"
               },
               "id": "color-contrast",
@@ -1894,7 +1824,7 @@
             }
           ],
           "any": [],
-          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\">",
+          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\"><h2 id=\"closing-title\">Nicht mehr Zeit.<br><em>Mehr Anwesenheit.</em></h2><a class=\"closing-action\" href=\"#workspace\"><span>Zurück in den Fokus</span><span aria-hidden=\"true\">↑</span></a></section>",
           "impact": null,
           "none": [
             {
@@ -2424,7 +2354,7 @@
             }
           ],
           "any": [],
-          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\">",
+          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\"><h2 id=\"closing-title\">Nicht mehr Zeit.<br><em>Mehr Anwesenheit.</em></h2><a class=\"closing-action\" href=\"#workspace\"><span>Zurück in den Fokus</span><span aria-hidden=\"true\">↑</span></a></section>",
           "impact": null,
           "none": [],
           "target": [
@@ -4080,7 +4010,7 @@
         {
           "all": [],
           "any": [],
-          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\">",
+          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\"><h2 id=\"closing-title\">Nicht mehr Zeit.<br><em>Mehr Anwesenheit.</em></h2><a class=\"closing-action\" href=\"#workspace\"><span>Zurück in den Fokus</span><span aria-hidden=\"true\">↑</span></a></section>",
           "impact": null,
           "none": [
             {
@@ -5688,7 +5618,7 @@
             }
           ],
           "any": [],
-          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\">",
+          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\"><h2 id=\"closing-title\">Nicht mehr Zeit.<br><em>Mehr Anwesenheit.</em></h2><a class=\"closing-action\" href=\"#workspace\"><span>Zurück in den Fokus</span><span aria-hidden=\"true\">↑</span></a></section>",
           "impact": null,
           "none": [],
           "target": [
@@ -6210,7 +6140,7 @@
               "relatedNodes": []
             }
           ],
-          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\">",
+          "html": "<section class=\"closing\" aria-labelledby=\"closing-title\"><h2 id=\"closing-title\">Nicht mehr Zeit.<br><em>Mehr Anwesenheit.</em></h2><a class=\"closing-action\" href=\"#workspace\"><span>Zurück in den Fokus</span><span aria-hidden=\"true\">↑</span></a></section>",
           "impact": null,
           "none": [],
           "target": [
@@ -7136,33 +7066,6 @@
           "none": [],
           "target": [
             ".data-promise > button[type=\"button\"]"
-          ]
-        },
-        {
-          "all": [],
-          "any": [
-            {
-              "data": {
-                "bgColor": "#f1f0e8",
-                "contrastRatio": 15.71,
-                "expectedContrastRatio": "4.5:1",
-                "fgColor": "#171714",
-                "fontSize": "8.2pt (10.88px)",
-                "fontWeight": "normal",
-                "messageKey": null,
-                "shadowColor": null
-              },
-              "id": "color-contrast",
-              "impact": "serious",
-              "message": "Element has sufficient color contrast of 15.71",
-              "relatedNodes": []
-            }
-          ],
-          "html": "<p class=\"eyebrow\"><span></span> Der nächste gute Schritt</p>",
-          "impact": null,
-          "none": [],
-          "target": [
-            ".eyebrow"
           ]
         },
         {
@@ -9487,7 +9390,7 @@
   "testRunner": {
     "name": "axe"
   },
-  "timestamp": "2026-08-15T13:43:43.016Z",
+  "timestamp": "2026-08-15T14:00:38.785Z",
   "toolOptions": {
     "reporter": "v1",
     "runOnly": {

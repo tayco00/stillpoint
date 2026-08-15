@@ -100,16 +100,6 @@ a { color: inherit; }
   justify-content: center;
   border-right: 1px solid var(--line);
 }
-.eyebrow {
-  margin: 0 0 2.25rem;
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-  font: 500 .68rem/1 var(--font-mono), monospace;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-.eyebrow span { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
 h1 {
   max-width: 900px;
   margin: 0;
@@ -223,9 +213,6 @@ h1 em {
 .start-button:hover, .start-button:focus-visible { background: var(--signal); color: var(--ink); }
 .reset-button { min-width: 48px; border: 1px solid var(--ink); background: transparent; font-size: 1.2rem; cursor: pointer; }
 .reset-button:hover, .reset-button:focus-visible { background: var(--acid); }
-.stage-caption { position: absolute; right: 2rem; bottom: 1.4rem; margin: 0; font: 500 .63rem/1 var(--font-mono), monospace; letter-spacing: .1em; text-transform: uppercase; }
-.stage-caption span { color: var(--signal-ink); margin-right: .7rem; }
-
 .marquee { overflow: hidden; border-block: 1px solid var(--ink); background: var(--acid); }
 .marquee-track { display: flex; width: max-content; animation: marquee 24s linear infinite; will-change: transform; }
 .marquee-group {
@@ -273,7 +260,6 @@ h1 em {
   .timer { font-size: clamp(4rem, 20vw, 6rem); }
   .duration-row { gap: .35rem; }
   .duration { flex: 1; padding-inline: .35rem; }
-  .stage-caption { right: 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

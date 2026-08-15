@@ -55,7 +55,6 @@ export function StillpointApp() {
         <InteractiveTools />
 
         <section className="closing" aria-labelledby="closing-title">
-          <p className="eyebrow"><span /> Der nächste gute Schritt</p>
           <h2 id="closing-title">Nicht mehr Zeit.<br /><em>Mehr Anwesenheit.</em></h2>
           <a className="closing-action" href="#workspace">
             <span>Zurück in den Fokus</span><span aria-hidden="true">↑</span>

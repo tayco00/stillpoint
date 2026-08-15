@@ -22,7 +22,6 @@ export function CaptureTool({ notes, onAdd, onRemove }: CaptureToolProps) {
 
   return (
     <article className="tool-card capture-card" data-reveal>
-      <div className="tool-index">04 / PARKPLATZ</div>
       <div className="tool-copy">
         <p className="tool-kicker">Gedanken parken</p>
         <h3>Nicht jetzt. Nicht weg.</h3>

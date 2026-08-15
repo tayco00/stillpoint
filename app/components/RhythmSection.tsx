@@ -27,7 +27,6 @@ export function RhythmSection({
   return (
     <section className="rhythm-section" id="rhythm" aria-labelledby="rhythm-title">
       <div className="section-heading light" data-reveal>
-        <p><span>05</span> Dein Rhythmus</p>
         <h2 id="rhythm-title">Fortschritt,<br /><em>ohne Druck.</em></h2>
         <p className="section-lede">Ein leiser Rückblick auf das, was du tatsächlich bewegt hast. Keine Rangliste, kein schlechtes Gewissen.</p>
       </div>

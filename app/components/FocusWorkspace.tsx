@@ -18,7 +18,6 @@ export function FocusWorkspace() {
         onDurationChange={setPreferredDuration}
         initialDuration={data.preferredDuration}
       />
-      <p className="stage-caption"><span>01</span> Mach nur das. Für jetzt.</p>
     </div>
   );
 }

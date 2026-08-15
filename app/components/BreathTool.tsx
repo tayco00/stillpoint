@@ -58,7 +58,6 @@ export function BreathTool({ onComplete }: BreathToolProps) {
 
   return (
     <article className="tool-card breath-card" data-reveal>
-      <div className="tool-index">02 / RESET</div>
       <div className="breath-visual" data-phase={running ? current.mode : "idle"} aria-hidden="true">
         <div className="breath-orb"><span /></div>
       </div>
