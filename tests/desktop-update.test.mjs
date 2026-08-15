@@ -9,9 +9,10 @@ const desktopMain = await readFile(
   new URL("../desktop/main.mjs", import.meta.url),
   "utf8",
 );
+const preload = await readFile(new URL("../desktop/preload.cjs", import.meta.url), "utf8");
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.2.0");
+  assert.equal(packageJson.version, "0.3.0");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -23,6 +24,16 @@ test("ships an installable GitHub update channel", () => {
       releaseType: "release",
     },
   ]);
+});
+
+test("keeps quick capture and gentle reminders in the desktop shell", () => {
+  assert.match(desktopMain, /new Tray\(/);
+  assert.match(desktopMain, /CommandOrControl\+Shift\+Space/);
+  assert.match(desktopMain, /stillpoint:\/\/app\/index\.html#quick-capture/);
+  assert.match(desktopMain, /new Notification\(/);
+  assert.match(desktopMain, /setInterval\(showFocusReminder/);
+  assert.match(desktopMain, /--shell-smoke-test/);
+  assert.match(preload, /stillpoint:reminder-preferences/);
 });
 
 test("checks for updates only in packaged, non-smoke-test builds", () => {

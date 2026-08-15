@@ -7,10 +7,12 @@ import {
   ENERGY_RECOMMENDATIONS,
   formatTime,
   getRecentDays,
+  getWeeklySummary,
   localDateKey,
   normalizeState,
   readPersistedState,
   readPersistedStateFrom,
+  reviewLatestSession,
   timerSnapshot,
   writePersistedState,
   writePersistedStateTo,
@@ -56,6 +58,52 @@ test("invalid stored data falls back safely and clamps user content", () => {
 
 test("the selected focus duration survives state normalization", () => {
   assert.equal(normalizeState({ preferredDuration: 60 }).preferredDuration, 60);
+});
+
+test("the local profile name survives reloads and is safely normalized", () => {
+  assert.equal(normalizeState({ profileName: "  Taylan  " }).profileName, "Taylan");
+  assert.equal(normalizeState({ profileName: "x".repeat(80) }).profileName.length, 40);
+  assert.equal(normalizeState({}).profileName, "");
+});
+
+test("session reviews preserve the next step for the next launch", () => {
+  const date = new Date(2026, 7, 15, 9, 30);
+  const completed = addSession(createDefaultState(), 45, date, {
+    intention: "Konzept fertigstellen",
+    energy: "steady",
+  });
+  const reviewed = reviewLatestSession(
+    completed,
+    "Die Struktur steht.",
+    "Die Einleitung schreiben",
+  );
+  assert.equal(reviewed.nextStep, "Die Einleitung schreiben");
+  assert.equal(reviewed.sessionHistory[0].outcome, "Die Struktur steht.");
+  assert.equal(reviewed.sessionHistory[0].energy, "steady");
+});
+
+test("weekly review finds the strongest local focus pattern", () => {
+  const today = new Date(2026, 7, 15, 12);
+  let state = addSession(createDefaultState(), 25, new Date(2026, 7, 13, 9), {
+    energy: "steady",
+  });
+  state = addSession(state, 45, new Date(2026, 7, 14, 10), { energy: "steady" });
+  state = addSession(state, 30, new Date(2026, 7, 15, 20), { energy: "low" });
+  const summary = getWeeklySummary(state, today);
+  assert.equal(summary.totalMinutes, 100);
+  assert.equal(summary.sessions, 3);
+  assert.equal(summary.focusDays, 3);
+  assert.equal(summary.bestTimeLabel, "Morgens");
+  assert.equal(summary.energyLabel, "Stabile Energie");
+});
+
+test("desktop preferences are normalized to safe local values", () => {
+  const normalized = normalizeState({
+    reminder: { enabled: true, intervalMinutes: 999 },
+    soundscape: { kind: "invalid", volume: 500 },
+  });
+  assert.deepEqual(normalized.reminder, { enabled: true, intervalMinutes: 60 });
+  assert.deepEqual(normalized.soundscape, { kind: "rain", volume: 100 });
 });
 
 test("unavailable and quota-full storage fail safely", () => {

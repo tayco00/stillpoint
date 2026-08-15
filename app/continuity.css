@@ -1,0 +1,46 @@
+.resume-card {
+  max-width: 38rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1.5rem;
+  margin-top: 2.2rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(23, 23, 20, .7);
+  background: rgba(250, 249, 243, .68);
+  box-shadow: 5px 5px 0 var(--acid);
+}
+.resume-card p { margin: 0 0 .5rem; font: 600 .64rem/1.2 var(--font-mono), monospace; letter-spacing: .08em; text-transform: uppercase; }
+.resume-card strong { display: block; line-height: 1.45; overflow-wrap: anywhere; }
+.resume-actions { display: grid; gap: .35rem; }
+.resume-actions button { min-height: 44px; padding: .65rem .8rem; border: 1px solid var(--ink); background: var(--ink); color: white; cursor: pointer; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.resume-actions button:last-child { background: transparent; color: var(--ink); }
+.resume-actions button:hover, .resume-actions button:focus-visible { background: var(--signal); color: var(--ink); }
+
+.ritual-dialog { width: min(calc(100% - 2rem), 700px); max-width: none; padding: 0; border: 1px solid var(--ink); background: var(--paper-bright); color: var(--ink); box-shadow: 14px 14px 0 var(--signal); }
+.ritual-dialog::backdrop { background: rgba(23, 23, 20, .74); backdrop-filter: blur(8px); }
+.ritual-card { display: grid; padding: clamp(1.6rem, 5vw, 3.5rem); }
+.ritual-kicker { margin: 0 0 1rem; font: 600 .66rem/1 var(--font-mono), monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--signal-ink); }
+.ritual-card h2 { margin: 0; font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: .94; letter-spacing: -.06em; }
+.ritual-card h2 em { font-family: Georgia, serif; font-weight: 400; color: var(--signal); }
+.ritual-card > p:not(.ritual-kicker) { margin: 1rem 0 2rem; line-height: 1.55; color: #575750; }
+.ritual-card label { margin: 1rem 0 .55rem; font-size: .7rem; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+.ritual-card textarea, .ritual-card input { width: 100%; border: 1px solid rgba(23, 23, 20, .6); border-radius: 0; background: transparent; color: var(--ink); outline: 0; }
+.ritual-card textarea { min-height: 100px; padding: .9rem; resize: vertical; }
+.ritual-card input { min-height: 52px; padding: .8rem .9rem; }
+.ritual-card textarea:focus, .ritual-card input:focus { border-color: var(--signal-ink); box-shadow: 0 0 0 2px var(--signal); }
+.ritual-card textarea::placeholder, .ritual-card input::placeholder { color: #686860; }
+.ritual-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.ritual-actions button { min-height: 48px; padding: .8rem 1rem; border: 1px solid var(--ink); background: var(--ink); color: white; cursor: pointer; font-weight: 700; }
+.ritual-actions button:first-child { display: flex; justify-content: space-between; gap: 2rem; }
+.ritual-actions button:last-child { border-color: transparent; background: transparent; color: var(--ink); }
+.ritual-actions button:hover, .ritual-actions button:focus-visible { background: var(--signal); color: var(--ink); }
+.ritual-actions button:disabled { cursor: not-allowed; opacity: .45; background: var(--ink); color: white; }
+
+@media (max-width: 600px) {
+  .resume-card { grid-template-columns: 1fr; }
+  .resume-actions { grid-template-columns: 1fr 1fr; }
+  .ritual-dialog { box-shadow: 7px 7px 0 var(--signal); }
+  .ritual-actions { align-items: stretch; flex-direction: column; }
+  .ritual-actions button { width: 100%; }
+}

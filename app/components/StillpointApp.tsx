@@ -1,12 +1,16 @@
 import { FocusWorkspace } from "./FocusWorkspace";
+import { FirstRunOnboarding, PersonalHeroIntro } from "./FirstRunOnboarding";
 import { InteractiveTools } from "./InteractiveTools";
+import { ResumeCard } from "./SessionContinuity";
 import { StillpointClient } from "./StillpointClient";
+import continuity from "../continuity.css?raw";
+import onboarding from "../onboarding.css?raw";
 import rhythm from "../rhythm.css?raw";
 import toolkit from "../toolkit.css?raw";
 
 const MARQUEE_ITEMS = ["KLARHEIT", "FOKUS", "FORTSCHRITT", "PAUSE", "KLARHEIT", "FOKUS"];
 
-export function StillpointApp() {
+export function StillpointApp({ desktop = false }: { desktop?: boolean }) {
   return (
     <StillpointClient>
       <main>
@@ -24,14 +28,12 @@ export function StillpointApp() {
         <section className="hero" id="top">
           <div className="hero-copy">
             <h1>Weniger<br />vorhaben. <em>Mehr</em><br />bewegen.</h1>
-            <p className="hero-intro">
-              Fokus, Energie und Fortschritt an einem Ort. Kostenlos, lokal gespeichert
-              und ohne den Lärm klassischer Produktivitäts-Apps.
-            </p>
+            <PersonalHeroIntro enabled={desktop} />
             <div className="hero-actions">
               <a className="primary-button" href="#workspace">Fokus starten <span aria-hidden="true">→</span></a>
               <a className="text-link" href="#tools">Erst umsehen <span aria-hidden="true">↓</span></a>
             </div>
+            {desktop ? <ResumeCard /> : null}
           </div>
           <FocusWorkspace />
         </section>
@@ -50,9 +52,9 @@ export function StillpointApp() {
           </div>
         </div>
 
-        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}\n${onboarding}\n${continuity}` }} />
 
-        <InteractiveTools />
+        <InteractiveTools desktop={desktop} />
 
         <section className="closing" aria-labelledby="closing-title">
           <h2 id="closing-title">Nicht mehr Zeit.<br /><em>Mehr Anwesenheit.</em></h2>
@@ -67,6 +69,7 @@ export function StillpointApp() {
           <div><a href="#tools">Werkzeuge</a><a href="#rhythm">Rhythmus</a><span>© {new Date().getFullYear()}</span></div>
         </footer>
       </main>
+      <FirstRunOnboarding enabled={desktop} />
     </StillpointClient>
   );
 }

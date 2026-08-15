@@ -1,7 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { StillpointApp } from "../app/components/StillpointApp";
+import { StillpointClient } from "../app/components/StillpointClient";
 import "../app/globals.css";
+import { QuickCapture } from "./QuickCapture";
+import "./quick-capture.css";
 
 const root = document.getElementById("root");
 
@@ -11,6 +14,10 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <StillpointApp />
+    {window.location.hash === "#quick-capture" ? (
+      <StillpointClient><QuickCapture /></StillpointClient>
+    ) : (
+      <StillpointApp desktop />
+    )}
   </StrictMode>,
 );

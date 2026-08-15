@@ -3,11 +3,12 @@
 import { useEffect } from "react";
 import { BreathTool } from "./BreathTool";
 import { CaptureTool } from "./CaptureTool";
+import { ReminderTool, SoundscapeTool } from "./DesktopTools";
 import { EnergyTool } from "./EnergyTool";
 import { RhythmSection } from "./RhythmSection";
 import { useStillpointContext } from "./StillpointClient";
 
-export function InteractiveTools() {
+export function InteractiveTools({ desktop = false }: { desktop?: boolean }) {
   const {
     data,
     recordBreath,
@@ -60,6 +61,8 @@ export function InteractiveTools() {
         <div className="tool-grid">
           <BreathTool onComplete={recordBreath} />
           <EnergyTool value={data.lastEnergy} onChange={setEnergy} onUseDuration={useDuration} />
+          {desktop ? <SoundscapeTool /> : null}
+          {desktop ? <ReminderTool /> : null}
           <CaptureTool notes={data.notes} onAdd={addNote} onRemove={removeNote} />
         </div>
       </section>

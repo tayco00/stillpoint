@@ -143,11 +143,53 @@
 .capture-list li button:hover, .capture-list li button:focus-visible { background: rgba(23,23,20,.1); }
 .empty-note { margin: 1rem 0 0; font: 400 .72rem/1.5 var(--font-mono), monospace; opacity: .65; }
 
+.soundscape-card { min-height: 680px; display: flex; flex-direction: column; background: #171714; color: white; }
+.soundscape-card .tool-copy > p:last-child { color: #c2c1b7; opacity: 1; }
+.sound-visual { min-height: 170px; display: flex; align-items: center; justify-content: center; gap: clamp(.35rem, 1vw, .75rem); margin: 2rem 0; border-block: 1px solid rgba(255,255,255,.22); }
+.sound-visual i { width: clamp(3px, .5vw, 7px); height: 18%; background: var(--acid); transform-origin: center; }
+.sound-visual.playing i { animation: sound-wave 1.4s ease-in-out infinite alternate; }
+.sound-visual i:nth-child(2n) { height: 36%; animation-delay: -.8s; }
+.sound-visual i:nth-child(3n) { height: 62%; animation-delay: -.35s; }
+.sound-visual i:nth-child(4n) { height: 82%; animation-delay: -1.1s; }
+@keyframes sound-wave { to { transform: scaleY(.28); opacity: .55; } }
+.sound-options { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(255,255,255,.35); }
+.sound-options button { min-height: 92px; display: grid; align-content: center; gap: .4rem; padding: .8rem; border: 0; border-right: 1px solid rgba(255,255,255,.35); background: transparent; color: white; cursor: pointer; text-align: left; }
+.sound-options button:last-child { border-right: 0; }
+.sound-options button.selected { background: var(--acid); color: var(--ink); }
+.sound-options button:hover, .sound-options button:focus-visible { background: var(--signal); color: var(--ink); }
+.sound-options strong { font-size: .8rem; }
+.sound-options span { color: inherit; font-size: .66rem; line-height: 1.35; opacity: .75; }
+.sound-controls { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: .7rem 1rem; margin-top: auto; padding-top: 1.7rem; }
+.sound-controls label { display: flex; justify-content: space-between; font: 500 .66rem/1 var(--font-mono), monospace; letter-spacing: .07em; text-transform: uppercase; }
+.sound-controls input { grid-column: 1; width: 100%; accent-color: var(--acid); }
+.sound-controls button { grid-column: 2; grid-row: 1 / 3; min-height: 50px; padding: .8rem 1rem; border: 1px solid white; background: transparent; color: white; cursor: pointer; font-weight: 700; }
+.sound-controls button:hover, .sound-controls button:focus-visible { background: white; color: var(--ink); }
+
+.reminder-card { min-height: 680px; display: flex; flex-direction: column; background: #d8e4d7; }
+.reminder-switch { width: 100%; min-height: 74px; display: flex; align-items: center; gap: 1rem; margin: 3rem 0 2rem; padding: 1rem; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; font-weight: 750; text-align: left; }
+.reminder-switch > span { width: 50px; height: 28px; flex: 0 0 auto; padding: 3px; border: 1px solid var(--ink); border-radius: 20px; background: rgba(23,23,20,.08); }
+.reminder-switch i { display: block; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); transition: transform .2s ease, background-color .2s ease; }
+.reminder-switch.active > span { background: var(--ink); }
+.reminder-switch.active i { transform: translateX(20px); background: var(--acid); }
+.reminder-switch:hover, .reminder-switch:focus-visible { background: var(--paper-bright); }
+.reminder-card fieldset { margin: 0; padding: 0; border: 0; }
+.reminder-card fieldset:disabled { opacity: .45; }
+.reminder-card legend { margin-bottom: .8rem; font: 600 .66rem/1 var(--font-mono), monospace; letter-spacing: .08em; text-transform: uppercase; }
+.reminder-options { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid rgba(23,23,20,.58); }
+.reminder-options label { position: relative; min-height: 72px; display: grid; place-items: center; border-right: 1px solid rgba(23,23,20,.58); cursor: pointer; }
+.reminder-options label:last-child { border-right: 0; }
+.reminder-options input { position: absolute; opacity: 0; }
+.reminder-options span { font: 600 .7rem/1 var(--font-mono), monospace; }
+.reminder-options label:has(input:checked) { background: var(--ink); color: white; }
+.reminder-options label:has(input:focus-visible) { outline: 3px solid white; outline-offset: 3px; box-shadow: 0 0 0 6px var(--ink); }
+.reminder-note { margin: auto 0 0; padding-top: 2rem; color: #56564f; font: 500 .68rem/1.55 var(--font-mono), monospace; }
+
 @media (max-width: 900px) {
   .section-heading { grid-template-columns: 1fr; }
   .section-heading .section-lede { max-width: 38rem; }
   .tool-grid { grid-template-columns: 1fr; }
   .capture-card { grid-column: auto; }
+  .soundscape-card, .reminder-card { min-height: 620px; }
 }
 
 @media (max-width: 640px) {
@@ -164,4 +206,12 @@
   .capture-card { display: block; }
   .capture-form { margin-top: 2.5rem; }
   .capture-list { margin-top: 1rem; }
+  .sound-options { grid-template-columns: 1fr; }
+  .sound-options button { min-height: 66px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.35); }
+  .sound-options button:last-child { border-bottom: 0; }
+  .sound-controls { grid-template-columns: 1fr; }
+  .sound-controls button { grid-column: 1; grid-row: auto; }
+  .reminder-options { grid-template-columns: 1fr 1fr; }
+  .reminder-options label:nth-child(2) { border-right: 0; }
+  .reminder-options label:nth-child(-n + 2) { border-bottom: 1px solid rgba(23,23,20,.58); }
 }

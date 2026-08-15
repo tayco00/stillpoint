@@ -1,6 +1,7 @@
 export const STORAGE_KEY = "stillpoint:v1";
-export const STATE_VERSION = 1 as const;
+export const STATE_VERSION = 2 as const;
 export const MAX_NOTES = 20;
+export const MAX_SESSION_HISTORY = 180;
 
 export type EnergyLevel = "low" | "steady" | "high";
 
@@ -16,14 +17,53 @@ export type DistractionNote = {
   createdAt: number;
 };
 
+export type SessionRecord = {
+  id: string;
+  completedAt: number;
+  minutes: number;
+  intention: string;
+  energy: EnergyLevel | null;
+  outcome: string;
+};
+
+export type ReminderInterval = 30 | 60 | 90 | 120;
+export type SoundscapeKind = "rain" | "brown" | "room";
+
+export type ReminderPreferences = {
+  enabled: boolean;
+  intervalMinutes: ReminderInterval;
+};
+
+export type SoundscapePreferences = {
+  kind: SoundscapeKind;
+  volume: number;
+};
+
 export type StillpointState = {
   version: typeof STATE_VERSION;
+  profileName: string;
+  nextStep: string;
   intention: string;
   notes: DistractionNote[];
+  sessionHistory: SessionRecord[];
   days: Record<string, DayStats>;
   reflection: { date: string; text: string };
   lastEnergy: EnergyLevel | null;
   preferredDuration: 25 | 45 | 60;
+  reminder: ReminderPreferences;
+  soundscape: SoundscapePreferences;
+};
+
+export type WeeklySummary = {
+  totalMinutes: number;
+  sessions: number;
+  focusDays: number;
+  breaths: number;
+  averageMinutes: number;
+  bestDayLabel: string;
+  bestTimeLabel: string;
+  energyLabel: string;
+  insight: string;
 };
 
 export type EnergyRecommendation = {
@@ -37,12 +77,17 @@ const EMPTY_DAY: DayStats = { sessions: 0, minutes: 0, breaths: 0 };
 export function createDefaultState(): StillpointState {
   return {
     version: STATE_VERSION,
+    profileName: "",
+    nextStep: "",
     intention: "",
     notes: [],
+    sessionHistory: [],
     days: {},
     reflection: { date: "", text: "" },
     lastEnergy: null,
     preferredDuration: 25,
+    reminder: { enabled: false, intervalMinutes: 60 },
+    soundscape: { kind: "rain", volume: 35 },
   };
 }
 
@@ -95,15 +140,53 @@ export function normalizeState(value: unknown): StillpointState {
         .map((note) => ({ ...note, text: note.text.slice(0, 180) }))
     : [];
 
+  const sessionHistory = Array.isArray(candidate.sessionHistory)
+    ? candidate.sessionHistory
+        .filter((record): record is SessionRecord =>
+          Boolean(
+            record &&
+              typeof record.id === "string" &&
+              typeof record.completedAt === "number" &&
+              Number.isFinite(record.completedAt) &&
+              typeof record.minutes === "number",
+          ),
+        )
+        .slice(-MAX_SESSION_HISTORY)
+        .map((record) => ({
+          id: record.id.slice(0, 80),
+          completedAt: record.completedAt,
+          minutes: finiteCount(record.minutes),
+          intention: typeof record.intention === "string" ? record.intention.slice(0, 180) : "",
+          energy: ["low", "steady", "high"].includes(record.energy ?? "")
+            ? record.energy
+            : null,
+          outcome: typeof record.outcome === "string" ? record.outcome.slice(0, 300) : "",
+        }))
+    : [];
+
   const reflection = candidate.reflection;
   const lastEnergy = ["low", "steady", "high"].includes(candidate.lastEnergy ?? "")
     ? (candidate.lastEnergy as EnergyLevel)
     : null;
+  const reminder = candidate.reminder;
+  const soundscape = candidate.soundscape;
+  const reminderInterval = [30, 60, 90, 120].includes(reminder?.intervalMinutes ?? 0)
+    ? (reminder?.intervalMinutes as ReminderInterval)
+    : fallback.reminder.intervalMinutes;
+  const soundscapeKind = ["rain", "brown", "room"].includes(soundscape?.kind ?? "")
+    ? (soundscape?.kind as SoundscapeKind)
+    : fallback.soundscape.kind;
 
   return {
     version: STATE_VERSION,
+    profileName:
+      typeof candidate.profileName === "string"
+        ? candidate.profileName.trim().slice(0, 40)
+        : fallback.profileName,
+    nextStep: typeof candidate.nextStep === "string" ? candidate.nextStep.slice(0, 180) : "",
     intention: typeof candidate.intention === "string" ? candidate.intention.slice(0, 180) : "",
     notes,
+    sessionHistory,
     days,
     reflection:
       reflection && typeof reflection.date === "string" && typeof reflection.text === "string"
@@ -113,6 +196,17 @@ export function normalizeState(value: unknown): StillpointState {
     preferredDuration: [25, 45, 60].includes(candidate.preferredDuration ?? 0)
       ? (candidate.preferredDuration as 25 | 45 | 60)
       : fallback.preferredDuration,
+    reminder: {
+      enabled: reminder?.enabled === true,
+      intervalMinutes: reminderInterval,
+    },
+    soundscape: {
+      kind: soundscapeKind,
+      volume:
+        typeof soundscape?.volume === "number" && Number.isFinite(soundscape.volume)
+          ? Math.min(100, Math.max(0, Math.round(soundscape.volume)))
+          : fallback.soundscape.volume,
+    },
   };
 }
 
@@ -164,19 +258,52 @@ export function timerSnapshot(endAt: number, now: number, completionRecorded = f
   return { remaining, shouldComplete: remaining === 0 && !completionRecorded };
 }
 
-export function addSession(state: StillpointState, minutes: number, date = new Date()) {
+export function addSession(
+  state: StillpointState,
+  minutes: number,
+  date = new Date(),
+  details: { intention?: string; energy?: EnergyLevel | null } = {},
+) {
   const key = localDateKey(date);
   const current = normalizeDay(state.days[key]);
+  const safeMinutes = finiteCount(minutes);
+  const record: SessionRecord = {
+    id: `${date.getTime()}-${state.sessionHistory.length}`,
+    completedAt: date.getTime(),
+    minutes: safeMinutes,
+    intention: (details.intention ?? "").slice(0, 180),
+    energy: details.energy ?? null,
+    outcome: "",
+  };
   return {
     ...state,
+    sessionHistory: [...state.sessionHistory, record].slice(-MAX_SESSION_HISTORY),
     days: {
       ...state.days,
       [key]: {
         ...current,
         sessions: current.sessions + 1,
-        minutes: current.minutes + finiteCount(minutes),
+        minutes: current.minutes + safeMinutes,
       },
     },
+  };
+}
+
+export function reviewLatestSession(
+  state: StillpointState,
+  outcome: string,
+  nextStep: string,
+) {
+  const cleanOutcome = outcome.trim().slice(0, 300);
+  const cleanNextStep = nextStep.trim().slice(0, 180);
+  const latestIndex = state.sessionHistory.length - 1;
+
+  return {
+    ...state,
+    nextStep: cleanNextStep,
+    sessionHistory: state.sessionHistory.map((record, index) =>
+      index === latestIndex ? { ...record, outcome: cleanOutcome } : record,
+    ),
   };
 }
 
@@ -202,6 +329,64 @@ export function getRecentDays(state: StillpointState, count = 7, today = new Dat
       ...normalizeDay(state.days[key]),
     };
   });
+}
+
+function timeBucket(timestamp: number) {
+  const hour = new Date(timestamp).getHours();
+  if (hour >= 5 && hour < 12) return "Morgens";
+  if (hour >= 12 && hour < 18) return "Nachmittags";
+  return "Abends";
+}
+
+export function getWeeklySummary(state: StillpointState, today = new Date()): WeeklySummary {
+  const days = getRecentDays(state, 7, today);
+  const totalMinutes = days.reduce((sum, day) => sum + day.minutes, 0);
+  const sessions = days.reduce((sum, day) => sum + day.sessions, 0);
+  const breaths = days.reduce((sum, day) => sum + day.breaths, 0);
+  const focusDays = days.filter((day) => day.minutes > 0).length;
+  const bestDay = days.reduce((best, day) => (day.minutes > best.minutes ? day : best), days[0]);
+  const dayKeys = new Set(days.map((day) => day.key));
+  const recentSessions = state.sessionHistory.filter((record) =>
+    dayKeys.has(localDateKey(new Date(record.completedAt))),
+  );
+  const timeTotals = new Map<string, number>();
+  const energyTotals = new Map<EnergyLevel, number>();
+
+  recentSessions.forEach((record) => {
+    const bucket = timeBucket(record.completedAt);
+    timeTotals.set(bucket, (timeTotals.get(bucket) ?? 0) + record.minutes);
+    if (record.energy) {
+      energyTotals.set(record.energy, (energyTotals.get(record.energy) ?? 0) + record.minutes);
+    }
+  });
+
+  const bestTime = [...timeTotals].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Noch offen";
+  const bestEnergy = [...energyTotals].sort((a, b) => b[1] - a[1])[0]?.[0];
+  const energyLabel = bestEnergy
+    ? { low: "Leise Energie", steady: "Stabile Energie", high: "Hohe Energie" }[bestEnergy]
+    : "Noch offen";
+  const averageMinutes = sessions > 0 ? Math.round(totalMinutes / sessions) : 0;
+
+  let insight = "Eine erste Fokusphase reicht, damit Stillpoint ein Muster erkennen kann.";
+  if (sessions > 0 && focusDays <= 2) {
+    insight = `Deine Sessions dauern im Schnitt ${averageMinutes} Minuten. Ein weiterer ruhiger Fokustag würde den Rhythmus stabilisieren.`;
+  } else if (focusDays >= 3 && bestTime !== "Noch offen") {
+    insight = `${bestTime} entsteht aktuell dein stärkstes Fokusfenster. Schütze dort zuerst den wichtigsten Schritt.`;
+  } else if (sessions > 0) {
+    insight = `${focusDays} Fokustage zeigen bereits einen Rhythmus. Entscheidend ist die Wiederaufnahme, nicht eine perfekte Serie.`;
+  }
+
+  return {
+    totalMinutes,
+    sessions,
+    focusDays,
+    breaths,
+    averageMinutes,
+    bestDayLabel: bestDay.minutes > 0 ? bestDay.label : "Noch offen",
+    bestTimeLabel: bestTime,
+    energyLabel,
+    insight,
+  };
 }
 
 export const ENERGY_RECOMMENDATIONS: Record<EnergyLevel, EnergyRecommendation> = {

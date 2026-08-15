@@ -1,6 +1,7 @@
 "use client";
 
 import { getRecentDays, localDateKey, type StillpointState } from "../lib/stillpoint";
+import { WeeklyReview } from "./WeeklyReview";
 
 type RhythmSectionProps = {
   data: StillpointState;
@@ -77,6 +78,8 @@ export function RhythmSection({
             {storageAvailable ? "Lokal gespeichert" : "Nur für diese Sitzung gespeichert"}
           </span>
         </div>
+
+        <WeeklyReview data={data} />
       </div>
 
       <div className="data-promise">

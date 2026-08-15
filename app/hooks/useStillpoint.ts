@@ -9,6 +9,9 @@ import {
   localDateKey,
   MAX_NOTES,
   readPersistedStateFrom,
+  type ReminderPreferences,
+  reviewLatestSession,
+  type SoundscapePreferences,
   STORAGE_KEY,
   type StillpointState,
   writePersistedStateTo,
@@ -30,6 +33,17 @@ export function useStillpoint() {
   }, []);
 
   useEffect(() => {
+    const syncFromStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) return;
+      const persisted = readPersistedStateFrom(() => window.localStorage);
+      setData(persisted.state);
+      setStorageAvailable(persisted.available);
+    };
+    window.addEventListener("storage", syncFromStorage);
+    return () => window.removeEventListener("storage", syncFromStorage);
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
     const nextStorageAvailable = writePersistedStateTo(() => window.localStorage, data);
     const statusUpdate = window.setTimeout(
@@ -43,8 +57,27 @@ export function useStillpoint() {
     setData((current) => ({ ...current, intention: intention.slice(0, 180) }));
   }, []);
 
+  const setProfileName = useCallback((profileName: string) => {
+    const cleanName = profileName.trim().replace(/\s+/g, " ").slice(0, 40);
+    if (!cleanName) return;
+    setData((current) => ({ ...current, profileName: cleanName }));
+  }, []);
+
+  const setNextStep = useCallback((nextStep: string) => {
+    setData((current) => ({ ...current, nextStep: nextStep.trim().slice(0, 180) }));
+  }, []);
+
   const recordSession = useCallback((minutes: number) => {
-    setData((current) => addSession(current, minutes));
+    setData((current) =>
+      addSession(current, minutes, new Date(), {
+        intention: current.intention,
+        energy: current.lastEnergy,
+      }),
+    );
+  }, []);
+
+  const completeSessionReview = useCallback((outcome: string, nextStep: string) => {
+    setData((current) => reviewLatestSession(current, outcome, nextStep));
   }, []);
 
   const recordBreath = useCallback(() => {
@@ -61,7 +94,7 @@ export function useStillpoint() {
 
   const addNote = useCallback((text: string) => {
     const clean = text.trim().slice(0, 180);
-    if (!clean) return;
+    if (!clean) return null;
     const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
     setData((current) => ({
       ...current,
@@ -70,6 +103,7 @@ export function useStillpoint() {
           ? current.notes
           : [...current.notes, { id, text: clean, createdAt: Date.now() }],
     }));
+    return id;
   }, []);
 
   const removeNote = useCallback((id: string) => {
@@ -81,6 +115,14 @@ export function useStillpoint() {
       ...current,
       reflection: { date: localDateKey(), text: text.slice(0, 500) },
     }));
+  }, []);
+
+  const setReminder = useCallback((reminder: ReminderPreferences) => {
+    setData((current) => ({ ...current, reminder }));
+  }, []);
+
+  const setSoundscape = useCallback((soundscape: SoundscapePreferences) => {
+    setData((current) => ({ ...current, soundscape }));
   }, []);
 
   const clearData = useCallback(() => {
@@ -96,14 +138,19 @@ export function useStillpoint() {
   return {
     data,
     ready,
+    setProfileName,
+    setNextStep,
     setIntention,
     recordSession,
+    completeSessionReview,
     recordBreath,
     setEnergy,
     setPreferredDuration,
     addNote,
     removeNote,
     setReflection,
+    setReminder,
+    setSoundscape,
     clearData,
     storageAvailable,
   };

@@ -28,8 +28,23 @@ Windows uninstaller.
 
 Installed copies check the public GitHub release channel after startup and then
 every six hours. Updates download automatically and are installed when
-Stillpoint is closed. Release publishing must include the installer,
+Stillpoint is exited from the Windows notification area. A ready update can
+also be installed immediately from the tray menu. Release publishing must include the installer,
 `latest.yml`, and the generated installer blockmap.
+
+## Desktop features
+
+- First-run profile and personal, device-local welcome
+- Persistent “continue where you stopped” next step
+- End-of-session reflection ritual
+- Tray quick capture and `Ctrl+Shift+Space` shortcut
+- Configurable, quiet Windows reminders
+- Seven-day focus review with time-of-day and energy patterns
+- Procedurally generated offline soundscapes
+
+Closing the main window keeps Stillpoint available in the Windows notification
+area so quick capture and reminders continue to work. Use **Stillpoint beenden**
+from the tray menu to exit completely.
 
 Generated desktop bundles and executables stay outside version control.
 
