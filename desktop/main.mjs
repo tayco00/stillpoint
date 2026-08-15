@@ -1,6 +1,11 @@
 import { app, BrowserWindow, Menu, net, protocol, session } from "electron";
+import updater from "electron-updater";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+
+const { autoUpdater } = updater;
+const UPDATE_CHECK_DELAY_MS = 10_000;
+const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -15,6 +20,26 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 const isSmokeTest = process.argv.includes("--smoke-test");
+
+function checkForUpdates() {
+  void autoUpdater.checkForUpdatesAndNotify().catch((error) => {
+    console.error("Stillpoint update check failed", error);
+  });
+}
+
+function startAutomaticUpdates() {
+  if (!app.isPackaged || isSmokeTest) return;
+
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  const initialCheck = setTimeout(checkForUpdates, UPDATE_CHECK_DELAY_MS);
+  const recurringCheck = setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
+  app.once("before-quit", () => {
+    clearTimeout(initialCheck);
+    clearInterval(recurringCheck);
+  });
+}
 
 function rendererResponse(request) {
   const rendererRoot = path.resolve(app.getAppPath(), "desktop-dist");
@@ -84,6 +109,7 @@ app.whenReady().then(async () => {
   });
   await protocol.handle("stillpoint", rendererResponse);
   createWindow();
+  startAutomaticUpdates();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

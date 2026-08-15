@@ -22,11 +22,14 @@ npm run desktop:build
 npm run desktop:package
 ```
 
-The packaging command creates two choices:
+The packaging command creates `desktop-release/Stillpoint-Setup.exe`. It
+installs Stillpoint with Desktop and Start-menu shortcuts and registers a normal
+Windows uninstaller.
 
-- `desktop-release/Stillpoint.exe` starts directly without installation.
-- `desktop-release/Stillpoint-Setup.exe` installs Stillpoint with optional
-  Desktop and Start-menu shortcuts.
+Installed copies check the public GitHub release channel after startup and then
+every six hours. Updates download automatically and are installed when
+Stillpoint is closed. Release publishing must include the installer,
+`latest.yml`, and the generated installer blockmap.
 
 Generated desktop bundles and executables stay outside version control.
 

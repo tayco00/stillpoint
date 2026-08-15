@@ -1,6 +1,6 @@
 {
   "name": "stillpoint-focus-workspace",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Stillpoint",
   "private": true,
   "main": "desktop/main.mjs",
@@ -13,12 +13,13 @@
     "start": "vinext start",
     "desktop:build": "tsc --noEmit -p tsconfig.desktop.json && vite build --config desktop.vite.config.ts",
     "desktop:package": "node scripts/generate-desktop-icon.mjs && npm run desktop:build && electron-builder --win --x64",
-    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/stillpoint.test.ts",
+    "test": "npm run build && node --experimental-strip-types --test tests/desktop-update.test.mjs tests/rendered-html.test.mjs tests/stillpoint.test.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern desktop-dist --ignore-pattern desktop-release --ignore-pattern .next",
     "audit:a11y": "node scripts/run-axe.mjs",
     "audit:proxy": "node scripts/audit-proxy.mjs"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
@@ -33,12 +34,12 @@
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
     "axe-core": "^4.11.0",
+    "electron": "43.4.0",
+    "electron-builder": "26.15.3",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
-    "electron": "43.4.0",
-    "electron-builder": "26.15.3",
     "globals": "16.4.0",
     "react-server-dom-webpack": "19.2.6",
     "selenium-webdriver": "^4.35.0",
@@ -50,6 +51,9 @@
     "wrangler": "4.92.0"
   },
   "type": "module",
+  "overrides": {
+    "js-yaml": "4.3.1"
+  },
   "build": {
     "appId": "de.stillpoint.focus",
     "productName": "Stillpoint",
@@ -61,16 +65,18 @@
       "desktop/main.mjs",
       "build/icon.png"
     ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "tayco00",
+        "repo": "stillpoint",
+        "releaseType": "release"
+      }
+    ],
     "win": {
-      "target": [
-        "portable",
-        "nsis"
-      ],
+      "target": "nsis",
       "icon": "build/icon.png",
       "artifactName": "Stillpoint.${ext}"
-    },
-    "portable": {
-      "artifactName": "Stillpoint.exe"
     },
     "nsis": {
       "artifactName": "Stillpoint-Setup.exe",
