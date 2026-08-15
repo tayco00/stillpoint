@@ -5,4 +5,7 @@ contextBridge.exposeInMainWorld("stillpointDesktop", {
   setReminderPreferences(preferences) {
     ipcRenderer.send("stillpoint:reminder-preferences", preferences);
   },
+  skipStartupUpdate() {
+    ipcRenderer.send("stillpoint:skip-startup-update");
+  },
 });

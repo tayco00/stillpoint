@@ -26,15 +26,19 @@ The packaging command creates `desktop-release/Stillpoint-Setup.exe`. It
 installs Stillpoint with Desktop and Start-menu shortcuts and registers a normal
 Windows uninstaller.
 
-Installed copies check the public GitHub release channel after startup and then
-every six hours. Updates download automatically and are installed when
-Stillpoint is exited from the Windows notification area. A ready update can
-also be installed immediately from the tray menu. Release publishing must include the installer,
-`latest.yml`, and the generated installer blockmap.
+Installed copies show a compact update window during startup and check the
+public GitHub release channel again every six hours. The window reports the
+search, download progress, and installation before Stillpoint restarts. Users
+can choose **Ohne Update starten** when they do not want to wait; a completed
+background download can then be installed from the tray menu or on exit.
+Release publishing must include the installer, `latest.yml`, and the generated
+installer blockmap.
 
 ## Desktop features
 
 - First-run profile and personal, device-local welcome
+- Rotating first-run examples with 28 diverse names
+- Visible startup update progress with an always-available skip action
 - Persistent “continue where you stopped” next step
 - End-of-session reflection ritual
 - Tray quick capture and `Ctrl+Shift+Space` shortcut

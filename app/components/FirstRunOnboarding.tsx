@@ -3,7 +3,36 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useStillpointContext } from "./StillpointClient";
 
-const EXAMPLE_NAMES = ["Mia", "Elias", "Aylin", "Noah", "Samira", "Mika", "Leonie", "Amir"];
+const EXAMPLE_NAMES = [
+  "Mia",
+  "Elias",
+  "Aylin",
+  "Noah",
+  "Samira",
+  "Mika",
+  "Leonie",
+  "Amir",
+  "Sofia",
+  "Ben",
+  "Layla",
+  "Finn",
+  "Elif",
+  "Luca",
+  "Nila",
+  "David",
+  "Zoe",
+  "Karim",
+  "Clara",
+  "Jun",
+  "Imani",
+  "Paul",
+  "Yara",
+  "Theo",
+  "Rania",
+  "Luis",
+  "Ada",
+  "Cem",
+];
 
 export function PersonalHeroIntro({ enabled }: { enabled: boolean }) {
   const { data, ready } = useStillpointContext();

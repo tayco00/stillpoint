@@ -1,6 +1,6 @@
 {
   "name": "stillpoint-focus-workspace",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Stillpoint",
   "private": true,
   "main": "desktop/main.mjs",
@@ -64,6 +64,9 @@
       "desktop-dist/**/*",
       "desktop/main.mjs",
       "desktop/preload.cjs",
+      "desktop/startup-window.mjs",
+      "desktop/startup.html",
+      "desktop/startup-renderer.js",
       "build/icon.png"
     ],
     "publish": [

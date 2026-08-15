@@ -9,5 +9,6 @@ interface Window {
       enabled: boolean;
       intervalMinutes: 30 | 60 | 90 | 120;
     }) => void;
+    skipStartupUpdate: () => void;
   };
 }

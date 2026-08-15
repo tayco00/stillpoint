@@ -14,15 +14,19 @@ import {
 import updater from "electron-updater";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { createStartupWindowController } from "./startup-window.mjs";
 
 const { autoUpdater } = updater;
-const UPDATE_CHECK_DELAY_MS = 10_000;
 const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const STARTUP_CHECK_TIMEOUT_MS = 15_000;
+const STARTUP_DOWNLOAD_TIMEOUT_MS = 5 * 60 * 1000;
 const REMINDER_INTERVALS = new Set([30, 60, 90, 120]);
 const isMainSmokeTest = process.argv.includes("--smoke-test");
 const isQuickCaptureSmokeTest = process.argv.includes("--quick-capture-smoke-test");
 const isShellSmokeTest = process.argv.includes("--shell-smoke-test");
-const isSmokeTest = isMainSmokeTest || isQuickCaptureSmokeTest || isShellSmokeTest;
+const isStartupSmokeTest = process.argv.includes("--startup-smoke-test");
+const isSmokeTest =
+  isMainSmokeTest || isQuickCaptureSmokeTest || isShellSmokeTest || isStartupSmokeTest;
 
 let mainWindow = null;
 let quickCaptureWindow = null;
@@ -31,6 +35,11 @@ let reminderTimer = null;
 let isQuitting = false;
 let hideNoticeShown = false;
 let updateReady = false;
+let mainRendererReady = false;
+let startupFinished = false;
+let startupUpdateActive = false;
+let startupSkipped = false;
+let startupTimeout = null;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -59,6 +68,7 @@ function rendererResponse(request) {
 }
 
 function showMainWindow() {
+  if (!startupFinished && startupController.show()) return;
   if (!mainWindow || mainWindow.isDestroyed()) {
     createMainWindow();
     return;
@@ -82,6 +92,57 @@ function secureWindow(window) {
   window.webContents.on("will-navigate", (event, url) => {
     if (!url.startsWith("stillpoint://app/")) event.preventDefault();
   });
+}
+
+function revealMainWindow() {
+  if (!startupFinished || !mainRendererReady || !mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+function setStartupStatus(nextStatus) {
+  startupController.setStatus(nextStatus);
+}
+
+function clearStartupTimeout() {
+  if (startupTimeout) clearTimeout(startupTimeout);
+  startupTimeout = null;
+}
+
+function scheduleStartupFinish(extraDelayMs = 0) {
+  if (startupFinished) return;
+  clearStartupTimeout();
+  startupUpdateActive = false;
+  startupController.finish(extraDelayMs);
+}
+
+function skipStartupUpdate() {
+  if (startupFinished || startupSkipped) return;
+  startupSkipped = true;
+  startupUpdateActive = false;
+  setStartupStatus({
+    title: "Stillpoint wird geöffnet",
+    detail: "Das Update kann im Hintergrund weitergeladen werden.",
+    progress: null,
+    label: "Startbereit",
+    canSkip: false,
+  });
+  scheduleStartupFinish(180);
+}
+
+const startupController = createStartupWindowController({
+  browserPreferences,
+  isSmokeTest: isStartupSmokeTest,
+  onFinished() {
+    startupFinished = true;
+    revealMainWindow();
+  },
+  onLoadFailure: scheduleStartupFinish,
+  onSkip: skipStartupUpdate,
+});
+
+function createStartupWindow() {
+  return startupController.create();
 }
 
 function createMainWindow() {
@@ -117,7 +178,8 @@ function createMainWindow() {
     if (mainWindow === window) mainWindow = null;
   });
   window.once("ready-to-show", () => {
-    if (!isSmokeTest) window.show();
+    mainRendererReady = true;
+    if (!isSmokeTest) revealMainWindow();
   });
   window.webContents.once("did-fail-load", () => {
     if (isSmokeTest) app.exit(1);
@@ -257,27 +319,107 @@ function checkForUpdates() {
   });
 }
 
+function showUpdateReadyNotification() {
+  updateReady = true;
+  updateTrayMenu();
+  if (!Notification.isSupported()) return;
+  const notification = new Notification({
+    title: "Stillpoint-Update bereit",
+    body: "Klicke hier, um Stillpoint neu zu starten und das Update zu installieren.",
+  });
+  notification.on("click", installReadyUpdate);
+  notification.show();
+}
+
+function finishStartupAfterFailure() {
+  if (!startupUpdateActive) return;
+  setStartupStatus({
+    title: "Stillpoint startet",
+    detail: "Die Updateprüfung ist gerade nicht erreichbar. Du kannst Stillpoint trotzdem verwenden.",
+    progress: null,
+    label: "Offline startbereit",
+    canSkip: false,
+  });
+  scheduleStartupFinish(700);
+}
+
 function startAutomaticUpdates() {
   if (!app.isPackaged || isSmokeTest) return;
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
+  startupUpdateActive = true;
+
+  autoUpdater.on("checking-for-update", () => {
+    if (!startupUpdateActive) return;
+    setStartupStatus({
+      title: "Nach Updates suchen",
+      detail: "Stillpoint prüft, ob eine neue Version bereitsteht.",
+      progress: null,
+      label: "Updateprüfung",
+      canSkip: true,
+    });
+  });
+  autoUpdater.on("update-available", (info) => {
+    if (!startupUpdateActive) return;
+    clearStartupTimeout();
+    setStartupStatus({
+      title: "Update gefunden",
+      detail: `Stillpoint ${info.version} wird jetzt sicher heruntergeladen.`,
+      progress: 0,
+      canSkip: true,
+    });
+    startupTimeout = setTimeout(skipStartupUpdate, STARTUP_DOWNLOAD_TIMEOUT_MS);
+  });
+  autoUpdater.on("download-progress", (progress) => {
+    if (!startupUpdateActive) return;
+    setStartupStatus({
+      title: "Update wird geladen",
+      detail: "Stillpoint bleibt nur noch einen Moment im Startfenster.",
+      progress: progress.percent,
+      canSkip: true,
+    });
+  });
+  autoUpdater.on("update-not-available", () => {
+    if (!startupUpdateActive) return;
+    setStartupStatus({
+      title: "Alles aktuell",
+      detail: "Du verwendest bereits die neueste Version von Stillpoint.",
+      progress: 100,
+      canSkip: false,
+    });
+    scheduleStartupFinish(500);
+  });
   autoUpdater.on("update-downloaded", () => {
-    updateReady = true;
-    updateTrayMenu();
-    if (Notification.isSupported()) {
-      const notification = new Notification({
-        title: "Stillpoint-Update bereit",
-        body: "Klicke hier, um Stillpoint neu zu starten und das Update zu installieren.",
+    if (startupUpdateActive && !startupSkipped) {
+      clearStartupTimeout();
+      startupUpdateActive = false;
+      setStartupStatus({
+        title: "Update wird installiert",
+        detail: "Stillpoint startet danach automatisch in der neuen Version.",
+        progress: 100,
+        canSkip: false,
       });
-      notification.on("click", installReadyUpdate);
-      notification.show();
+      setTimeout(() => {
+        isQuitting = true;
+        autoUpdater.quitAndInstall(false, true);
+      }, 900);
+      return;
     }
+    showUpdateReadyNotification();
+  });
+  autoUpdater.on("error", (error) => {
+    console.error("Stillpoint update check failed", error);
+    finishStartupAfterFailure();
   });
 
-  const initialCheck = setTimeout(checkForUpdates, UPDATE_CHECK_DELAY_MS);
+  startupTimeout = setTimeout(finishStartupAfterFailure, STARTUP_CHECK_TIMEOUT_MS);
+  void autoUpdater.checkForUpdates().catch((error) => {
+    console.error("Stillpoint startup update check failed", error);
+    finishStartupAfterFailure();
+  });
   const recurringCheck = setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
   app.once("before-quit", () => {
-    clearTimeout(initialCheck);
+    clearStartupTimeout();
     clearInterval(recurringCheck);
   });
 }
@@ -294,9 +436,20 @@ if (singleInstance) {
     ipcMain.on("stillpoint:reminder-preferences", (_event, preferences) => {
       configureReminder(preferences);
     });
+    ipcMain.on("stillpoint:skip-startup-update", (event) => {
+      if (startupController.isSender(event.sender)) startupController.skip();
+    });
 
-    if (isQuickCaptureSmokeTest) openQuickCapture();
-    else createMainWindow();
+    if (isStartupSmokeTest) {
+      createStartupWindow();
+    } else if (isQuickCaptureSmokeTest) {
+      startupFinished = true;
+      openQuickCapture();
+    } else {
+      if (app.isPackaged && !isSmokeTest) createStartupWindow();
+      else startupFinished = true;
+      createMainWindow();
+    }
     if (!isSmokeTest || isShellSmokeTest) {
       createTray();
       globalShortcut.register("CommandOrControl+Shift+Space", openQuickCapture);
@@ -308,6 +461,8 @@ if (singleInstance) {
 
   app.on("before-quit", () => {
     isQuitting = true;
+    clearStartupTimeout();
+    startupController.dispose();
     if (reminderTimer) clearInterval(reminderTimer);
   });
 
