@@ -1,7 +1,9 @@
 {
   "name": "stillpoint-focus-workspace",
   "version": "0.1.0",
+  "description": "Stillpoint",
   "private": true,
+  "main": "desktop/main.mjs",
   "engines": {
     "node": ">=22.13.0"
   },
@@ -9,8 +11,10 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
+    "desktop:build": "tsc --noEmit -p tsconfig.desktop.json && vite build --config desktop.vite.config.ts",
+    "desktop:package": "node scripts/generate-desktop-icon.mjs && npm run desktop:build && electron-builder --win portable --x64",
     "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/stillpoint.test.ts",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern desktop-dist --ignore-pattern desktop-release --ignore-pattern .next",
     "audit:a11y": "node scripts/run-axe.mjs",
     "audit:proxy": "node scripts/audit-proxy.mjs"
   },
@@ -33,14 +37,34 @@
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
+    "electron": "43.4.0",
+    "electron-builder": "26.15.3",
     "globals": "16.4.0",
     "react-server-dom-webpack": "19.2.6",
     "selenium-webdriver": "^4.35.0",
+    "sharp": "0.35.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
     "vinext": "1.0.0-beta.2",
     "vite": "8.0.13",
     "wrangler": "4.92.0"
   },
-  "type": "module"
+  "type": "module",
+  "build": {
+    "appId": "de.stillpoint.focus",
+    "productName": "Stillpoint",
+    "directories": {
+      "output": "desktop-release"
+    },
+    "files": [
+      "desktop-dist/**/*",
+      "desktop/main.mjs",
+      "build/icon.png"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.png",
+      "artifactName": "Stillpoint.${ext}"
+    }
+  }
 }

@@ -13,7 +13,7 @@ type BreathToolProps = { onComplete: () => void };
 export function BreathTool({ onComplete }: BreathToolProps) {
   const [running, setRunning] = useState(false);
   const [phase, setPhase] = useState(0);
-  const [remaining, setRemaining] = useState(PHASES[0].seconds);
+  const [remaining, setRemaining] = useState<number>(PHASES[0].seconds);
   const [cycles, setCycles] = useState(0);
   const [completed, setCompleted] = useState(false);
 

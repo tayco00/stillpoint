@@ -35,6 +35,11 @@ yarn-error.log*
 .vercel
 
 /dist/
+/desktop-dist/
+/desktop-release/
+/build/
+/Stillpoint.exe
+*.tsbuildinfo
 /.wrangler/
 /outputs/
 /work/
