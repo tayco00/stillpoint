@@ -101,7 +101,7 @@
   background: #ff7b62;
 }
 .energy-card .tool-index { color: #4a2119; opacity: 1; }
-.energy-options { display: grid; grid-template-columns: repeat(3, 1fr); margin: 2.5rem 0; border: 1px solid rgba(23,23,20,.55); }
+.energy-options { display: grid; grid-template-columns: repeat(3, 1fr); margin: 2.5rem 0; border: 1px solid rgba(23,23,20,.62); }
 .energy-option {
   min-height: 100px;
   display: grid;
@@ -109,7 +109,7 @@
   align-content: center;
   gap: .55rem;
   border: 0;
-  border-right: 1px solid rgba(23,23,20,.55);
+  border-right: 1px solid rgba(23,23,20,.62);
   background: transparent;
   cursor: pointer;
   font: 600 .7rem/1 var(--font-mono), monospace;
@@ -141,7 +141,7 @@
 .capture-card .tool-copy { grid-row: span 2; align-self: center; }
 .capture-form { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: 1fr 52px; align-self: end; border-bottom: 2px solid var(--ink); }
 .capture-form input { min-width: 0; padding: 1rem 0; border: 0; outline: 0; background: transparent; font-size: clamp(1.1rem, 2vw, 1.6rem); }
-.capture-form input::placeholder { color: rgba(23,23,20,.5); }
+.capture-form input::placeholder { color: rgba(23,23,20,.66); }
 .capture-form button { min-height: 52px; border: 0; background: var(--ink); color: white; font-size: 1.5rem; cursor: pointer; }
 .capture-form button:hover, .capture-form button:focus-visible { background: #292bbd; }
 .capture-form :disabled { cursor: not-allowed; opacity: .62; }

@@ -218,7 +218,7 @@ h1 em {
 .focus-input:focus { border-bottom-color: var(--signal); box-shadow: 0 2px 0 var(--signal); }
 .focus-input::placeholder { color: #6d6d65; }
 .duration-row { display: flex; gap: .5rem; margin: 1.5rem 0; }
-.duration { padding: .6rem .75rem; border: 1px solid var(--line); background: transparent; cursor: pointer; font: 500 .68rem/1 var(--font-mono), monospace; }
+.duration { padding: .6rem .75rem; border: 1px solid rgba(23,23,20,.55); background: transparent; cursor: pointer; font: 500 .68rem/1 var(--font-mono), monospace; }
 .duration:hover, .duration:focus-visible, .duration.active { border-color: var(--ink); background: var(--ink); color: white; }
 .timer-actions { display: grid; grid-template-columns: 1fr 48px; gap: .6rem; }
 .start-button { width: 100%; display: flex; justify-content: space-between; padding: 1.1rem 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
