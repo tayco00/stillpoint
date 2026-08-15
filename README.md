@@ -12,6 +12,20 @@ npm install
 npm run dev
 ```
 
+## Windows desktop app
+
+Stillpoint also ships as a portable, offline-capable Windows application. The
+desktop and web targets render the same shared product surface and keep their
+data locally on the device.
+
+```bash
+npm run desktop:build
+npm run desktop:package
+```
+
+The packaging command creates `desktop-release/Stillpoint.exe`. Generated
+desktop bundles and executables stay outside version control.
+
 ## Validate
 
 ```bash
@@ -26,6 +40,8 @@ rendering and product-logic tests. The measurable completion contract lives in
 ## Architecture
 
 - `app/components` contains the bounded interactive product surfaces.
+- `app/components/StillpointApp.tsx` is shared by the web and desktop targets.
+- `desktop` contains the sandboxed Electron window and its local renderer.
 - `StillpointClient` is a small shared-state provider; static hero and navigation
   remain server-rendered while the tools hydrate as focused client islands.
 - `app/hooks/useStillpoint.ts` owns safe, device-local persistence.
