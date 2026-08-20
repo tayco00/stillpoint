@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addBreathReset,
   addSession,
   createDefaultState,
   type EnergyLevel,
+  type FontScale,
   localDateKey,
   MAX_NOTES,
   readPersistedStateFrom,
@@ -13,30 +14,51 @@ import {
   reviewLatestSession,
   STORAGE_KEY,
   type StillpointState,
-  writePersistedStateTo,
 } from "../lib/stillpoint";
+import {
+  cleanProfileName,
+  createEmptyProfileStore,
+  createProfile,
+  MAX_PROFILES,
+  PROFILE_STORAGE_KEY,
+  readProfileStoreFrom,
+  type ProfileStore,
+  writeProfileStoreTo,
+} from "../lib/profiles";
 
 export function useStillpoint() {
-  const [data, setData] = useState<StillpointState>(createDefaultState);
+  const [store, setStore] = useState<ProfileStore>(createEmptyProfileStore);
   const [ready, setReady] = useState(false);
   const [storageAvailable, setStorageAvailable] = useState(true);
+  const [profileSelectionRequired, setProfileSelectionRequired] = useState(false);
+
+  const activeProfile = store.profiles.find(
+    (profile) => profile.id === store.activeProfileId,
+  );
+  const data = useMemo(
+    () => activeProfile?.state ?? createDefaultState(),
+    [activeProfile],
+  );
 
   useEffect(() => {
-    const persisted = readPersistedStateFrom(() => window.localStorage);
+    const legacy = readPersistedStateFrom(() => window.localStorage);
+    const persisted = readProfileStoreFrom(() => window.localStorage, legacy.state);
     const hydration = window.setTimeout(() => {
-      setData(persisted.state);
+      setStore(persisted.store);
       setReady(true);
-      setStorageAvailable(persisted.available);
+      setStorageAvailable(legacy.available && persisted.available);
+      setProfileSelectionRequired(persisted.store.profiles.length > 1);
     }, 0);
     return () => window.clearTimeout(hydration);
   }, []);
 
   useEffect(() => {
     const syncFromStorage = (event: StorageEvent) => {
-      if (event.key !== STORAGE_KEY) return;
-      const persisted = readPersistedStateFrom(() => window.localStorage);
-      setData(persisted.state);
-      setStorageAvailable(persisted.available);
+      if (event.key !== PROFILE_STORAGE_KEY) return;
+      const legacy = readPersistedStateFrom(() => window.localStorage);
+      const persisted = readProfileStoreFrom(() => window.localStorage, legacy.state);
+      setStore(persisted.store);
+      setStorageAvailable(legacy.available && persisted.available);
     };
     window.addEventListener("storage", syncFromStorage);
     return () => window.removeEventListener("storage", syncFromStorage);
@@ -44,58 +66,129 @@ export function useStillpoint() {
 
   useEffect(() => {
     if (!ready) return;
-    const nextStorageAvailable = writePersistedStateTo(() => window.localStorage, data);
-    const statusUpdate = window.setTimeout(
-      () => setStorageAvailable(nextStorageAvailable),
-      0,
-    );
+    const available = writeProfileStoreTo(() => window.localStorage, store);
+    const statusUpdate = window.setTimeout(() => setStorageAvailable(available), 0);
     return () => window.clearTimeout(statusUpdate);
-  }, [data, ready]);
+  }, [ready, store]);
+
+  useEffect(() => {
+    document.documentElement.dataset.fontScale = data.fontScale;
+  }, [data.fontScale]);
+
+  const updateActiveState = useCallback(
+    (update: (current: StillpointState) => StillpointState) => {
+      setStore((current) => ({
+        ...current,
+        profiles: current.profiles.map((profile) =>
+          profile.id === current.activeProfileId
+            ? { ...profile, state: update(profile.state) }
+            : profile,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const createLocalProfile = useCallback(
+    (name: string) => {
+      const cleanName = cleanProfileName(name);
+      if (
+        !cleanName ||
+        store.profiles.length >= MAX_PROFILES ||
+        store.profiles.some(
+          (profile) =>
+            profile.name.toLocaleLowerCase("de") === cleanName.toLocaleLowerCase("de"),
+        )
+      ) {
+        return false;
+      }
+      const profile = createProfile(cleanName);
+      setStore((current) => ({
+        ...current,
+        activeProfileId: profile.id,
+        profiles: [...current.profiles, profile],
+      }));
+      setProfileSelectionRequired(false);
+      return true;
+    },
+    [store.profiles],
+  );
+
+  const selectProfile = useCallback((profileId: string) => {
+    setStore((current) =>
+      current.profiles.some((profile) => profile.id === profileId)
+        ? { ...current, activeProfileId: profileId }
+        : current,
+    );
+    setProfileSelectionRequired(false);
+  }, []);
+
+  const requestProfileSelection = useCallback(() => {
+    setProfileSelectionRequired(true);
+  }, []);
+
+  const deleteProfile = useCallback((profileId: string) => {
+    setStore((current) => {
+      if (current.profiles.length <= 1) return current;
+      const profiles = current.profiles.filter((profile) => profile.id !== profileId);
+      const activeProfileId = profiles.some(
+        (profile) => profile.id === current.activeProfileId,
+      )
+        ? current.activeProfileId
+        : profiles[0].id;
+      return { ...current, profiles, activeProfileId };
+    });
+  }, []);
 
   const setIntention = useCallback((intention: string) => {
-    setData((current) => ({ ...current, intention: intention.slice(0, 180) }));
-  }, []);
-
-  const setProfileName = useCallback((profileName: string) => {
-    const cleanName = profileName.trim().replace(/\s+/g, " ").slice(0, 40);
-    if (!cleanName) return;
-    setData((current) => ({ ...current, profileName: cleanName }));
-  }, []);
+    updateActiveState((current) => ({ ...current, intention: intention.slice(0, 180) }));
+  }, [updateActiveState]);
 
   const setNextStep = useCallback((nextStep: string) => {
-    setData((current) => ({ ...current, nextStep: nextStep.trim().slice(0, 180) }));
-  }, []);
+    updateActiveState((current) => ({
+      ...current,
+      nextStep: nextStep.trim().slice(0, 180),
+    }));
+  }, [updateActiveState]);
 
   const recordSession = useCallback((minutes: number) => {
-    setData((current) =>
+    updateActiveState((current) =>
       addSession(current, minutes, new Date(), {
         intention: current.intention,
         energy: current.lastEnergy,
       }),
     );
-  }, []);
+  }, [updateActiveState]);
 
   const completeSessionReview = useCallback((outcome: string, nextStep: string) => {
-    setData((current) => reviewLatestSession(current, outcome, nextStep));
-  }, []);
+    updateActiveState((current) => reviewLatestSession(current, outcome, nextStep));
+  }, [updateActiveState]);
 
   const recordBreath = useCallback(() => {
-    setData((current) => addBreathReset(current));
-  }, []);
+    updateActiveState((current) => addBreathReset(current));
+  }, [updateActiveState]);
 
   const setEnergy = useCallback((lastEnergy: EnergyLevel) => {
-    setData((current) => ({ ...current, lastEnergy }));
-  }, []);
+    updateActiveState((current) => ({ ...current, lastEnergy }));
+  }, [updateActiveState]);
 
   const setPreferredDuration = useCallback((preferredDuration: 25 | 45 | 60) => {
-    setData((current) => ({ ...current, preferredDuration }));
-  }, []);
+    updateActiveState((current) => ({ ...current, preferredDuration }));
+  }, [updateActiveState]);
+
+  const setCompletionSound = useCallback((completionSound: boolean) => {
+    updateActiveState((current) => ({ ...current, completionSound }));
+  }, [updateActiveState]);
+
+  const setFontScale = useCallback((fontScale: FontScale) => {
+    updateActiveState((current) => ({ ...current, fontScale }));
+  }, [updateActiveState]);
 
   const addNote = useCallback((text: string) => {
     const clean = text.trim().slice(0, 180);
     if (!clean) return null;
     const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
-    setData((current) => ({
+    updateActiveState((current) => ({
       ...current,
       notes:
         current.notes.length >= MAX_NOTES
@@ -103,37 +196,47 @@ export function useStillpoint() {
           : [...current.notes, { id, text: clean, createdAt: Date.now() }],
     }));
     return id;
-  }, []);
+  }, [updateActiveState]);
 
   const removeNote = useCallback((id: string) => {
-    setData((current) => ({ ...current, notes: current.notes.filter((note) => note.id !== id) }));
-  }, []);
+    updateActiveState((current) => ({
+      ...current,
+      notes: current.notes.filter((note) => note.id !== id),
+    }));
+  }, [updateActiveState]);
 
   const setReflection = useCallback((text: string) => {
-    setData((current) => ({
+    updateActiveState((current) => ({
       ...current,
       reflection: { date: localDateKey(), text: text.slice(0, 500) },
     }));
-  }, []);
+  }, [updateActiveState]);
 
   const setReminder = useCallback((reminder: ReminderPreferences) => {
-    setData((current) => ({ ...current, reminder }));
-  }, []);
+    updateActiveState((current) => ({ ...current, reminder }));
+  }, [updateActiveState]);
 
   const clearData = useCallback(() => {
     try {
+      window.localStorage.removeItem(PROFILE_STORAGE_KEY);
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {
-      // The reset still applies to the current session.
       setStorageAvailable(false);
     }
-    setData(createDefaultState());
+    setStore(createEmptyProfileStore());
+    setProfileSelectionRequired(false);
   }, []);
 
   return {
     data,
+    profiles: store.profiles.map(({ id, name, createdAt }) => ({ id, name, createdAt })),
+    activeProfileId: store.activeProfileId,
+    profileSelectionRequired,
     ready,
-    setProfileName,
+    createProfile: createLocalProfile,
+    selectProfile,
+    requestProfileSelection,
+    deleteProfile,
     setNextStep,
     setIntention,
     recordSession,
@@ -141,6 +244,8 @@ export function useStillpoint() {
     recordBreath,
     setEnergy,
     setPreferredDuration,
+    setCompletionSound,
+    setFontScale,
     addNote,
     removeNote,
     setReflection,

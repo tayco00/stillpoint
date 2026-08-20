@@ -11,15 +11,11 @@ import {
   session,
   Tray,
 } from "electron";
-import updater from "electron-updater";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { createStartupWindowController } from "./startup-window.mjs";
+import { createUpdateService } from "./update-service.mjs";
 
-const { autoUpdater } = updater;
-const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
-const STARTUP_CHECK_TIMEOUT_MS = 15_000;
-const STARTUP_DOWNLOAD_TIMEOUT_MS = 5 * 60 * 1000;
 const REMINDER_INTERVALS = new Set([30, 60, 90, 120]);
 const isMainSmokeTest = process.argv.includes("--smoke-test");
 const isQuickCaptureSmokeTest = process.argv.includes("--quick-capture-smoke-test");
@@ -34,12 +30,9 @@ let tray = null;
 let reminderTimer = null;
 let isQuitting = false;
 let hideNoticeShown = false;
-let updateReady = false;
 let mainRendererReady = false;
 let startupFinished = false;
-let startupUpdateActive = false;
-let startupSkipped = false;
-let startupTimeout = null;
+let startupController = null;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -100,45 +93,27 @@ function revealMainWindow() {
   mainWindow.focus();
 }
 
-function setStartupStatus(nextStatus) {
-  startupController.setStatus(nextStatus);
-}
+const updateService = createUpdateService({
+  app,
+  isSmokeTest,
+  getMainWindow: () => mainWindow,
+  getStartupController: () => startupController,
+  isStartupFinished: () => startupFinished,
+  onBeforeInstall: () => {
+    isQuitting = true;
+  },
+  onReadyChange: updateTrayMenu,
+});
 
-function clearStartupTimeout() {
-  if (startupTimeout) clearTimeout(startupTimeout);
-  startupTimeout = null;
-}
-
-function scheduleStartupFinish(extraDelayMs = 0) {
-  if (startupFinished) return;
-  clearStartupTimeout();
-  startupUpdateActive = false;
-  startupController.finish(extraDelayMs);
-}
-
-function skipStartupUpdate() {
-  if (startupFinished || startupSkipped) return;
-  startupSkipped = true;
-  startupUpdateActive = false;
-  setStartupStatus({
-    title: "Stillpoint wird geöffnet",
-    detail: "Das Update kann im Hintergrund weitergeladen werden.",
-    progress: null,
-    label: "Startbereit",
-    canSkip: false,
-  });
-  scheduleStartupFinish(180);
-}
-
-const startupController = createStartupWindowController({
+startupController = createStartupWindowController({
   browserPreferences,
   isSmokeTest: isStartupSmokeTest,
   onFinished() {
     startupFinished = true;
     revealMainWindow();
   },
-  onLoadFailure: scheduleStartupFinish,
-  onSkip: skipStartupUpdate,
+  onLoadFailure: () => updateService.finishStartup(),
+  onSkip: updateService.skipStartupUpdate,
 });
 
 function createStartupWindow() {
@@ -239,6 +214,18 @@ function openQuickCapture() {
     await new Promise((resolve) => setTimeout(resolve, 100));
     const captureSaved = await window.webContents.executeJavaScript(`
       (async () => {
+        localStorage.setItem('stillpoint:profiles:v1', JSON.stringify({
+          version: 1,
+          activeProfileId: 'smoke-profile',
+          profiles: [{
+            id: 'smoke-profile',
+            name: 'Smoke',
+            createdAt: Date.now(),
+            state: { profileName: 'Smoke' }
+          }]
+        }));
+        window.dispatchEvent(new StorageEvent('storage', { key: 'stillpoint:profiles:v1' }));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         const input = document.querySelector('#quick-note');
         const form = document.querySelector('form');
         if (!input || !form) return false;
@@ -247,8 +234,10 @@ function openQuickCapture() {
         input.dispatchEvent(new Event('input', { bubbles: true }));
         form.requestSubmit();
         await new Promise((resolve) => setTimeout(resolve, 250));
-        const stored = JSON.parse(localStorage.getItem('stillpoint:v1') || '{}');
-        return stored.notes?.some((note) => note.text === 'Smoke-Test-Notiz') === true;
+        const stored = JSON.parse(localStorage.getItem('stillpoint:profiles:v1') || '{}');
+        return stored.profiles?.[0]?.state?.notes?.some(
+          (note) => note.text === 'Smoke-Test-Notiz'
+        ) === true;
       })()
     `);
     app.exit(captureSaved ? 0 : 1);
@@ -265,9 +254,7 @@ function quitStillpoint() {
 }
 
 function installReadyUpdate() {
-  if (!updateReady) return;
-  isQuitting = true;
-  autoUpdater.quitAndInstall(false, true);
+  updateService.installReadyUpdate();
 }
 
 function updateTrayMenu() {
@@ -275,7 +262,7 @@ function updateTrayMenu() {
   const template = [
     { label: "Stillpoint öffnen", click: showMainWindow },
     { label: "Schnellnotiz", accelerator: "CommandOrControl+Shift+Space", click: openQuickCapture },
-    ...(updateReady
+    ...(updateService.isReady()
       ? [{ type: "separator" }, { label: "Update installieren und neu starten", click: installReadyUpdate }]
       : []),
     { type: "separator" },
@@ -313,117 +300,6 @@ function configureReminder(preferences) {
   reminderTimer = setInterval(showFocusReminder, intervalMinutes * 60 * 1000);
 }
 
-function checkForUpdates() {
-  void autoUpdater.checkForUpdatesAndNotify().catch((error) => {
-    console.error("Stillpoint update check failed", error);
-  });
-}
-
-function showUpdateReadyNotification() {
-  updateReady = true;
-  updateTrayMenu();
-  if (!Notification.isSupported()) return;
-  const notification = new Notification({
-    title: "Stillpoint-Update bereit",
-    body: "Klicke hier, um Stillpoint neu zu starten und das Update zu installieren.",
-  });
-  notification.on("click", installReadyUpdate);
-  notification.show();
-}
-
-function finishStartupAfterFailure() {
-  if (!startupUpdateActive) return;
-  setStartupStatus({
-    title: "Stillpoint startet",
-    detail: "Die Updateprüfung ist gerade nicht erreichbar. Du kannst Stillpoint trotzdem verwenden.",
-    progress: null,
-    label: "Offline startbereit",
-    canSkip: false,
-  });
-  scheduleStartupFinish(700);
-}
-
-function startAutomaticUpdates() {
-  if (!app.isPackaged || isSmokeTest) return;
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
-  startupUpdateActive = true;
-
-  autoUpdater.on("checking-for-update", () => {
-    if (!startupUpdateActive) return;
-    setStartupStatus({
-      title: "Nach Updates suchen",
-      detail: "Stillpoint prüft, ob eine neue Version bereitsteht.",
-      progress: null,
-      label: "Updateprüfung",
-      canSkip: true,
-    });
-  });
-  autoUpdater.on("update-available", (info) => {
-    if (!startupUpdateActive) return;
-    clearStartupTimeout();
-    setStartupStatus({
-      title: "Update gefunden",
-      detail: `Stillpoint ${info.version} wird jetzt sicher heruntergeladen.`,
-      progress: 0,
-      canSkip: true,
-    });
-    startupTimeout = setTimeout(skipStartupUpdate, STARTUP_DOWNLOAD_TIMEOUT_MS);
-  });
-  autoUpdater.on("download-progress", (progress) => {
-    if (!startupUpdateActive) return;
-    setStartupStatus({
-      title: "Update wird geladen",
-      detail: "Stillpoint bleibt nur noch einen Moment im Startfenster.",
-      progress: progress.percent,
-      canSkip: true,
-    });
-  });
-  autoUpdater.on("update-not-available", () => {
-    if (!startupUpdateActive) return;
-    setStartupStatus({
-      title: "Alles aktuell",
-      detail: "Du verwendest bereits die neueste Version von Stillpoint.",
-      progress: 100,
-      canSkip: false,
-    });
-    scheduleStartupFinish(500);
-  });
-  autoUpdater.on("update-downloaded", () => {
-    if (startupUpdateActive && !startupSkipped) {
-      clearStartupTimeout();
-      startupUpdateActive = false;
-      setStartupStatus({
-        title: "Update wird installiert",
-        detail: "Stillpoint startet danach automatisch in der neuen Version.",
-        progress: 100,
-        canSkip: false,
-      });
-      setTimeout(() => {
-        isQuitting = true;
-        autoUpdater.quitAndInstall(false, true);
-      }, 900);
-      return;
-    }
-    showUpdateReadyNotification();
-  });
-  autoUpdater.on("error", (error) => {
-    console.error("Stillpoint update check failed", error);
-    finishStartupAfterFailure();
-  });
-
-  startupTimeout = setTimeout(finishStartupAfterFailure, STARTUP_CHECK_TIMEOUT_MS);
-  void autoUpdater.checkForUpdates().catch((error) => {
-    console.error("Stillpoint startup update check failed", error);
-    finishStartupAfterFailure();
-  });
-  const recurringCheck = setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
-  app.once("before-quit", () => {
-    clearStartupTimeout();
-    clearInterval(recurringCheck);
-  });
-}
-
 if (singleInstance) {
   app.on("second-instance", showMainWindow);
 
@@ -438,6 +314,15 @@ if (singleInstance) {
     });
     ipcMain.on("stillpoint:skip-startup-update", (event) => {
       if (startupController.isSender(event.sender)) startupController.skip();
+    });
+    ipcMain.handle("stillpoint:check-for-updates", (event) => {
+      if (!mainWindow || event.sender !== mainWindow.webContents) {
+        return { state: "error", message: "Updateprüfung nicht verfügbar." };
+      }
+      return updateService.checkManually();
+    });
+    ipcMain.on("stillpoint:install-update", (event) => {
+      if (mainWindow && event.sender === mainWindow.webContents) installReadyUpdate();
     });
 
     if (isStartupSmokeTest) {
@@ -454,14 +339,14 @@ if (singleInstance) {
       createTray();
       globalShortcut.register("CommandOrControl+Shift+Space", openQuickCapture);
     }
-    startAutomaticUpdates();
+    updateService.start();
 
     app.on("activate", showMainWindow);
   });
 
   app.on("before-quit", () => {
     isQuitting = true;
-    clearStartupTimeout();
+    updateService.dispose();
     startupController.dispose();
     if (reminderTimer) clearInterval(reminderTimer);
   });

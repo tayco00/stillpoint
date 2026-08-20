@@ -30,10 +30,13 @@ Menschen möglichst lange in der Anwendung halten sollen.
 ### Fokus und Abschluss
 
 - Fokus-Timer für 25, 45 oder 60 Minuten
+- Sanfter, lokal erzeugter Dreiklang am Ende einer Fokuszeit
 - Frei formulierbares Ziel für die aktuelle Session
 - Pausieren, Fortsetzen und Zurücksetzen mit korrekter Zeitmessung
 - Abschlussdialog für Ergebnis und nächsten guten Schritt
 - Persönliche Begrüßung nach einer einmaligen Namensabfrage
+- Bis zu acht lokale Profile mit eigener Auswahl beim Start und vollständig
+  getrennten Fortschritten, Notizen und Einstellungen
 - 28 wechselnde, neutrale Beispielnamen im Erststart-Feld
 - Wiederaufnahme des zuletzt festgehaltenen nächsten Schritts
 
@@ -46,6 +49,9 @@ Menschen möglichst lange in der Anwendung halten sollen.
   `Strg + Umschalt + Leertaste`
 - Einstellbare, ruhige Windows-Erinnerungen nach 30, 60, 90 oder 120 Minuten
   im Bereich **Einstellungen**
+- Umschaltbare Großschrift für eine besser lesbare Oberfläche
+- Manuelle Updateprüfung mit Status und Downloadfortschritt direkt unter
+  **Einstellungen**
 
 ### Rückblick
 
@@ -89,6 +95,9 @@ Mit **Ohne Update starten** lässt sich Stillpoint jederzeit direkt öffnen. Ein
 bereits begonnener Download kann im Hintergrund weiterlaufen. Sobald ein Update
 bereitsteht, kann es über das Stillpoint-Symbol im Windows-Infobereich
 installiert werden; spätestens beim vollständigen Beenden wird es übernommen.
+Zusätzlich lässt sich die Prüfung jederzeit über **Einstellungen →
+Aktualisierung → Nach Updates suchen** starten. Ist ein Update vollständig
+geladen, kann es dort direkt installiert werden.
 
 ## Verhalten im Windows-Infobereich
 
@@ -107,11 +116,14 @@ Zum vollständigen Beenden:
 - Keine Werbung und keine Analyse- oder Trackingdienste
 - Keine Übertragung von Aktivitätsdaten an einen Server
 - Keine Cloud-Synchronisierung
-- Notizen, Einstellungen und Fortschritt bleiben auf dem jeweiligen Gerät
+- Profile, Notizen, Einstellungen und Fortschritt bleiben auf dem jeweiligen Gerät
+- Profile auf demselben Gerät speichern ihre Daten vollständig getrennt
 
 Die Daten werden nicht automatisch zwischen mehreren Computern übertragen.
-Über **Lokale Daten löschen** im Bereich „Dein Rhythmus“ kann der gespeicherte
-Stand vollständig zurückgesetzt werden.
+Über **Lokale Daten löschen** im Bereich „Dein Rhythmus“ können alle Profile
+und der gesamte gespeicherte Stand vollständig zurückgesetzt werden. Einzelne
+Profile lassen sich in den Einstellungen löschen, solange mindestens ein Profil
+erhalten bleibt.
 
 ## Technischer Aufbau
 
@@ -184,7 +196,7 @@ Ein vollständiges Desktop-Release benötigt genau diese drei Dateien:
 - `Stillpoint-Setup.exe.blockmap`
 - `latest.yml`
 
-Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.3.2`
+Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.4.0`
 veröffentlicht. `latest.yml` und die Blockmap sind notwendig, damit bereits
 installierte Anwendungen das Update erkennen und effizient herunterladen
 können.

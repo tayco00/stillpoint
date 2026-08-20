@@ -55,7 +55,7 @@ export function PersonalHeroIntro({ enabled }: { enabled: boolean }) {
 }
 
 export function FirstRunOnboarding({ enabled }: { enabled: boolean }) {
-  const { data, ready, setProfileName } = useStillpointContext();
+  const { data, ready, createProfile } = useStillpointContext();
   const [name, setName] = useState("");
   const [exampleIndex, setExampleIndex] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -91,7 +91,7 @@ export function FirstRunOnboarding({ enabled }: { enabled: boolean }) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!cleanName) return;
-    setProfileName(cleanName);
+    createProfile(cleanName);
   };
 
   return (

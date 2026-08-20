@@ -33,6 +33,8 @@ export type ReminderPreferences = {
   intervalMinutes: ReminderInterval;
 };
 
+export type FontScale = "standard" | "large";
+
 export type StillpointState = {
   version: typeof STATE_VERSION;
   profileName: string;
@@ -45,6 +47,8 @@ export type StillpointState = {
   lastEnergy: EnergyLevel | null;
   preferredDuration: 25 | 45 | 60;
   reminder: ReminderPreferences;
+  completionSound: boolean;
+  fontScale: FontScale;
 };
 
 export type WeeklySummary = {
@@ -80,6 +84,8 @@ export function createDefaultState(): StillpointState {
     lastEnergy: null,
     preferredDuration: 25,
     reminder: { enabled: false, intervalMinutes: 60 },
+    completionSound: true,
+    fontScale: "standard",
   };
 }
 
@@ -188,6 +194,8 @@ export function normalizeState(value: unknown): StillpointState {
       enabled: reminder?.enabled === true,
       intervalMinutes: reminderInterval,
     },
+    completionSound: candidate.completionSound !== false,
+    fontScale: candidate.fontScale === "large" ? "large" : "standard",
   };
 }
 

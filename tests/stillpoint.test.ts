@@ -17,6 +17,14 @@ import {
   writePersistedState,
   writePersistedStateTo,
 } from "../app/lib/stillpoint.ts";
+import { COMPLETION_TONE_NOTES } from "../app/lib/completion-tone.ts";
+import {
+  createProfile,
+  migrateLegacyState,
+  normalizeProfileStore,
+  readProfileStoreFrom,
+  writeProfileStore,
+} from "../app/lib/profiles.ts";
 
 test("timer formatting is stable at boundaries", () => {
   assert.equal(formatTime(0), "00:00");
@@ -58,6 +66,21 @@ test("invalid stored data falls back safely and clamps user content", () => {
 
 test("the selected focus duration survives state normalization", () => {
   assert.equal(normalizeState({ preferredDuration: 60 }).preferredDuration, 60);
+});
+
+test("display size and completion sound preferences survive normalization", () => {
+  const personalized = normalizeState({ fontScale: "large", completionSound: false });
+  assert.equal(personalized.fontScale, "large");
+  assert.equal(personalized.completionSound, false);
+  assert.equal(normalizeState({ fontScale: "huge" }).fontScale, "standard");
+  assert.equal(normalizeState({}).completionSound, true);
+});
+
+test("the completion cue is a gentle ascending three-note chord", () => {
+  assert.equal(COMPLETION_TONE_NOTES.length, 3);
+  assert.ok(COMPLETION_TONE_NOTES[0].frequency < COMPLETION_TONE_NOTES[1].frequency);
+  assert.ok(COMPLETION_TONE_NOTES[1].frequency < COMPLETION_TONE_NOTES[2].frequency);
+  assert.ok(COMPLETION_TONE_NOTES.every((note) => note.duration < 1.5));
 });
 
 test("the local profile name survives reloads and is safely normalized", () => {
@@ -133,6 +156,50 @@ test("unavailable and quota-full storage fail safely", () => {
     writePersistedStateTo(() => {
       throw new DOMException("Storage policy", "SecurityError");
     }, createDefaultState()),
+    false,
+  );
+});
+
+test("legacy single-person data migrates into the first local profile", () => {
+  const legacy = {
+    ...createDefaultState(),
+    profileName: "Mia",
+    intention: "Konzept abschließen",
+  };
+  const migrated = migrateLegacyState(legacy, 100);
+  assert.equal(migrated.profiles.length, 1);
+  assert.equal(migrated.profiles[0].name, "Mia");
+  assert.equal(migrated.profiles[0].state.intention, "Konzept abschließen");
+  assert.equal(migrated.activeProfileId, migrated.profiles[0].id);
+});
+
+test("profile normalization keeps local data separate and selects a valid profile", () => {
+  const mia = createProfile("Mia", 1);
+  const noah = createProfile("Noah", 2);
+  mia.state.intention = "Text schreiben";
+  noah.state.intention = "Skizze prüfen";
+  const normalized = normalizeProfileStore({
+    activeProfileId: "missing",
+    profiles: [mia, noah],
+  });
+  assert.equal(normalized.activeProfileId, mia.id);
+  assert.equal(normalized.profiles[0].state.intention, "Text schreiben");
+  assert.equal(normalized.profiles[1].state.intention, "Skizze prüfen");
+});
+
+test("profile storage failures are contained without losing migrated session data", () => {
+  const legacy = { ...createDefaultState(), profileName: "Aylin" };
+  const read = readProfileStoreFrom(() => {
+    throw new DOMException("Storage policy", "SecurityError");
+  }, legacy);
+  assert.equal(read.available, false);
+  assert.equal(read.store.profiles[0].name, "Aylin");
+  assert.equal(
+    writeProfileStore({
+      setItem() {
+        throw new Error("quota full");
+      },
+    }, read.store),
     false,
   );
 });

@@ -36,6 +36,7 @@ export function FocusWorkspace() {
         onComplete={completeSession}
         onDurationChange={setPreferredDuration}
         initialDuration={data.preferredDuration}
+        completionSound={data.completionSound}
       />
       <SessionRitual
         open={ritualOpen}

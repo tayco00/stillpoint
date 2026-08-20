@@ -18,6 +18,23 @@ const desktopSettings = await readFile(
   new URL("../app/components/DesktopSettings.tsx", import.meta.url),
   "utf8",
 );
+const updateService = await readFile(
+  new URL("../desktop/update-service.mjs", import.meta.url),
+  "utf8",
+);
+const desktopUpdateCode = desktopMain + "\n" + updateService;
+const profileSettings = await readFile(
+  new URL("../app/components/ProfileSettings.tsx", import.meta.url),
+  "utf8",
+);
+const profilePicker = await readFile(
+  new URL("../app/components/ProfilePicker.tsx", import.meta.url),
+  "utf8",
+);
+const focusTimer = await readFile(
+  new URL("../app/components/FocusTimer.tsx", import.meta.url),
+  "utf8",
+);
 const interactiveTools = await readFile(
   new URL("../app/components/InteractiveTools.tsx", import.meta.url),
   "utf8",
@@ -36,7 +53,7 @@ const startupRenderer = await readFile(
 );
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.3.3");
+  assert.equal(packageJson.version, "0.4.0");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -78,6 +95,19 @@ test("keeps quick capture and settings-based reminders in the desktop shell", ()
   assert.doesNotMatch(interactiveTools, /ReminderTool|Sanfte Erinnerung/);
 });
 
+test("adds profile selection, large text, a completion cue, and manual updates", () => {
+  assert.match(profilePicker, /Wer nutzt Stillpoint/);
+  assert.match(profileSettings, /Weiteres Profil/);
+  assert.match(desktopSettings, /Schriftgröße/);
+  assert.match(desktopSettings, /Abschlusston/);
+  assert.match(desktopSettings, /Nach Updates suchen/);
+  assert.match(focusTimer, /playCompletionTone/);
+  assert.match(preload, /stillpoint:check-for-updates/);
+  assert.match(preload, /stillpoint:update-status/);
+  assert.match(updateService, /checkManually/);
+  assert.match(desktopMain, /stillpoint:install-update/);
+});
+
 test("removes offline soundscapes from UI and persisted state", () => {
   assert.doesNotMatch(interactiveTools, /Soundscape|soundscape|Klangraum/);
   assert.doesNotMatch(desktopSettings, /Soundscape|soundscape|Klangraum/);
@@ -85,20 +115,20 @@ test("removes offline soundscapes from UI and persisted state", () => {
 });
 
 test("checks for updates only in packaged, non-smoke-test builds", () => {
-  assert.match(desktopMain, /from "electron-updater"/);
-  assert.match(desktopMain, /if \(!app\.isPackaged \|\| isSmokeTest\) return/);
-  assert.match(desktopMain, /checkForUpdatesAndNotify\(\)/);
-  assert.match(desktopMain, /autoDownload = true/);
-  assert.match(desktopMain, /autoInstallOnAppQuit = true/);
+  assert.match(updateService, /from "electron-updater"/);
+  assert.match(updateService, /if \(!app\.isPackaged \|\| isSmokeTest\) return/);
+  assert.match(updateService, /checkForUpdatesAndNotify\(\)/);
+  assert.match(updateService, /autoDownload = true/);
+  assert.match(updateService, /autoInstallOnAppQuit = true/);
 });
 
 test("shows real startup update status and offers a safe skip action", () => {
   assert.match(desktopMain, /--startup-smoke-test/);
-  assert.match(desktopMain, /"checking-for-update"/);
-  assert.match(desktopMain, /"update-available"/);
-  assert.match(desktopMain, /"download-progress"/);
-  assert.match(desktopMain, /"update-not-available"/);
-  assert.match(desktopMain, /quitAndInstall\(false, true\)/);
+  assert.match(desktopUpdateCode, /"checking-for-update"/);
+  assert.match(desktopUpdateCode, /"update-available"/);
+  assert.match(desktopUpdateCode, /"download-progress"/);
+  assert.match(desktopUpdateCode, /"update-not-available"/);
+  assert.match(desktopUpdateCode, /quitAndInstall\(false, true\)/);
   assert.match(desktopMain, /stillpoint:skip-startup-update/);
   assert.match(preload, /stillpoint:skip-startup-update/);
   assert.match(startupHtml, /id="startup-progress" role="progressbar"/);

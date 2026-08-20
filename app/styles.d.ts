@@ -10,5 +10,32 @@ interface Window {
       intervalMinutes: 30 | 60 | 90 | 120;
     }) => void;
     skipStartupUpdate: () => void;
+    checkForUpdates: () => Promise<{
+      state:
+        | "idle"
+        | "checking"
+        | "available"
+        | "downloading"
+        | "ready"
+        | "current"
+        | "error";
+      message: string;
+      progress?: number;
+    }>;
+    installReadyUpdate: () => void;
+    onUpdateStatus: (
+      callback: (status: {
+        state:
+          | "idle"
+          | "checking"
+          | "available"
+          | "downloading"
+          | "ready"
+          | "current"
+          | "error";
+        message: string;
+        progress?: number;
+      }) => void,
+    ) => () => void;
   };
 }

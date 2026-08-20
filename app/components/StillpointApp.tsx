@@ -4,10 +4,12 @@ import { InteractiveTools } from "./InteractiveTools";
 import { DesktopSettings } from "./DesktopSettings";
 import { ResumeCard } from "./SessionContinuity";
 import { StillpointClient } from "./StillpointClient";
+import { ProfilePicker } from "./ProfilePicker";
 import continuity from "../continuity.css?raw";
 import onboarding from "../onboarding.css?raw";
 import rhythm from "../rhythm.css?raw";
 import settings from "../settings.css?raw";
+import profiles from "../profiles.css?raw";
 import toolkit from "../toolkit.css?raw";
 
 const MARQUEE_ITEMS = ["KLARHEIT", "FOKUS", "FORTSCHRITT", "PAUSE", "KLARHEIT", "FOKUS"];
@@ -57,7 +59,7 @@ export function StillpointApp({ desktop = false }: { desktop?: boolean }) {
           </div>
         </div>
 
-        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}\n${onboarding}\n${continuity}\n${settings}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `${toolkit}\n${rhythm}\n${onboarding}\n${continuity}\n${settings}\n${profiles}` }} />
 
         <InteractiveTools />
 
@@ -75,6 +77,7 @@ export function StillpointApp({ desktop = false }: { desktop?: boolean }) {
         </footer>
       </main>
       <FirstRunOnboarding enabled={desktop} />
+      <ProfilePicker enabled={desktop} />
     </StillpointClient>
   );
 }

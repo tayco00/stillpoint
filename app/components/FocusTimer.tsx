@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatTime, timerSnapshot } from "../lib/stillpoint";
+import { playCompletionTone, prepareCompletionTone } from "../lib/completion-tone";
 
 const PRESETS = [25, 45, 60] as const;
 
@@ -11,6 +12,7 @@ type FocusTimerProps = {
   onComplete: (minutes: number) => void;
   onDurationChange: (minutes: 25 | 45 | 60) => void;
   initialDuration: number;
+  completionSound: boolean;
 };
 
 export function FocusTimer({
@@ -19,6 +21,7 @@ export function FocusTimer({
   onComplete,
   onDurationChange,
   initialDuration,
+  completionSound,
 }: FocusTimerProps) {
   const safeInitialDuration = PRESETS.includes(initialDuration as (typeof PRESETS)[number])
     ? initialDuration
@@ -41,6 +44,7 @@ export function FocusTimer({
         endAt.current = null;
         if (snapshot.shouldComplete) {
           completed.current = true;
+          if (completionSound) playCompletionTone();
           onComplete(duration);
           setMessage(`Stark. ${duration} Minuten Fokus sind für heute verbucht.`);
         }
@@ -50,7 +54,7 @@ export function FocusTimer({
     tick();
     const timer = window.setInterval(tick, 250);
     return () => window.clearInterval(timer);
-  }, [duration, isRunning, onComplete]);
+  }, [completionSound, duration, isRunning, onComplete]);
 
   const selectDuration = (minutes: (typeof PRESETS)[number]) => {
     setDuration(minutes);
@@ -62,7 +66,7 @@ export function FocusTimer({
     setMessage(`${minutes} Minuten sind eingestellt.`);
   };
 
-  const toggleTimer = () => {
+  const toggleTimer = async () => {
     if (isRunning) {
       setIsRunning(false);
       endAt.current = null;
@@ -70,6 +74,7 @@ export function FocusTimer({
       return;
     }
     const nextRemaining = remaining === 0 ? duration * 60 : remaining;
+    if (completionSound) await prepareCompletionTone();
     setRemaining(nextRemaining);
     endAt.current = Date.now() + nextRemaining * 1000;
     completed.current = false;
@@ -134,7 +139,7 @@ export function FocusTimer({
         ))}
       </div>
       <div className="timer-actions">
-        <button className="start-button" type="button" onClick={toggleTimer}>
+        <button className="start-button" type="button" onClick={() => void toggleTimer()}>
           <span>{isRunning ? "Pause" : remaining === 0 ? "Nochmal" : "Session starten"}</span>
           <span aria-hidden="true">{isRunning ? "Ⅱ" : "→"}</span>
         </button>

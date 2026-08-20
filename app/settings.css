@@ -33,6 +33,7 @@
   background: var(--paper-bright);
   color: var(--ink);
   box-shadow: 14px 14px 0 var(--acid);
+  overflow: auto;
 }
 
 .settings-dialog::backdrop {
@@ -93,10 +94,44 @@
 }
 
 .settings-reminder {
+  margin-top: 1.2rem;
   padding: clamp(1.2rem, 3vw, 2rem);
   border: 1px solid rgba(23, 23, 20, .65);
   background: #d8e4d7;
 }
+
+.settings-card {
+  margin-top: 1.2rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid rgba(23, 23, 20, .65);
+  background: var(--paper-bright);
+}
+
+.settings-display { background: #efe9dd; }
+.settings-sound { background: #f2cfbf; }
+.settings-update { background: #d9dde9; }
+
+.settings-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1.6rem;
+  border: 1px solid var(--ink);
+}
+
+.settings-choice button {
+  min-height: 58px;
+  border: 0;
+  border-right: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.settings-choice button:last-child { border-right: 0; }
+.settings-choice button[aria-pressed="true"] { background: var(--ink); color: white; }
+.settings-choice button:hover,
+.settings-choice button:focus-visible { background: var(--acid); color: var(--ink); }
 
 .settings-section-copy h3 {
   margin: 0;
@@ -163,6 +198,27 @@
 .settings-options label:has(input:checked) { background: var(--ink); color: white; }
 .settings-options label:has(input:focus-visible) { outline: 3px solid white; outline-offset: 3px; box-shadow: 0 0 0 6px var(--ink); }
 .settings-note { margin: 1.2rem 0 0; color: #56564f; font: 500 .68rem/1.55 var(--font-mono), monospace; }
+
+.update-action {
+  display: grid;
+  gap: .8rem;
+  margin-top: 1.6rem;
+}
+
+.update-action button {
+  min-height: 54px;
+  padding: .8rem 1rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.update-action button:hover,
+.update-action button:focus-visible { background: var(--acid); color: var(--ink); }
+.update-action button:disabled { cursor: wait; opacity: .55; }
+.update-action progress { width: 100%; accent-color: var(--signal); }
 
 .settings-done {
   min-height: 48px;
