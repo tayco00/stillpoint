@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { type ReminderInterval } from "../lib/stillpoint";
+import { playCompletionTone, prepareCompletionTone } from "../lib/completion-tone";
 import { ProfileSettings } from "./ProfileSettings";
 import { useStillpointContext } from "./StillpointClient";
 
@@ -24,11 +25,20 @@ export function DesktopSettings() {
     ready,
     setReminder,
     setCompletionSound,
+    setCompletionSoundVolume,
     setFontScale,
   } = useStillpointContext();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(INITIAL_UPDATE_STATUS);
+  const [soundPreviewMessage, setSoundPreviewMessage] = useState("");
+  const soundVolumePercent = Math.round(data.completionSoundVolume * 100);
+  const soundVolumeLabel =
+    soundVolumePercent <= 35
+      ? "Dezent"
+      : soundVolumePercent <= 70
+        ? "Ausgewogen"
+        : "Deutlich";
 
   useEffect(() => {
     if (!ready) return;
@@ -62,6 +72,25 @@ export function DesktopSettings() {
     if (!desktop) return;
     setUpdateStatus({ state: "checking", message: "Stillpoint sucht nach Updates …" });
     setUpdateStatus(await desktop.checkForUpdates());
+  };
+
+  const previewCompletionSound = async (
+    volume = data.completionSoundVolume,
+  ) => {
+    await prepareCompletionTone();
+    const played = playCompletionTone(volume);
+    setSoundPreviewMessage(
+      played
+        ? "Vorschau in " + Math.round(volume * 100) + " Prozent Lautstärke."
+        : "Die Tonvorschau konnte gerade nicht abgespielt werden.",
+    );
+  };
+
+  const toggleCompletionSound = async () => {
+    const enabled = !data.completionSound;
+    setCompletionSound(enabled);
+    setSoundPreviewMessage("");
+    if (enabled) await previewCompletionSound();
   };
 
   return (
@@ -130,11 +159,60 @@ export function DesktopSettings() {
               type="button"
               role="switch"
               aria-checked={data.completionSound}
-              onClick={() => setCompletionSound(!data.completionSound)}
+              onClick={() => void toggleCompletionSound()}
             >
               <span aria-hidden="true"><i /></span>
               {data.completionSound ? "Aktiv" : "Aus"}
             </button>
+
+            <fieldset className="sound-volume" disabled={!data.completionSound}>
+              <legend>Lautstärke des Abschlusstons</legend>
+              <div className="sound-volume-heading">
+                <label htmlFor="completion-sound-volume">Lautstärke</label>
+                <output htmlFor="completion-sound-volume">
+                  {soundVolumeLabel} · {soundVolumePercent} %
+                </output>
+              </div>
+              <input
+                id="completion-sound-volume"
+                type="range"
+                min="10"
+                max="100"
+                step="5"
+                value={soundVolumePercent}
+                aria-valuetext={soundVolumeLabel + ", " + soundVolumePercent + " Prozent"}
+                onChange={(event) => {
+                  setCompletionSoundVolume(Number(event.target.value) / 100);
+                  setSoundPreviewMessage("");
+                }}
+                onPointerUp={(event) =>
+                  void previewCompletionSound(Number(event.currentTarget.value) / 100)
+                }
+                onKeyUp={(event) => {
+                  if (
+                    ["ArrowLeft", "ArrowRight", "Home", "End", "PageUp", "PageDown"].includes(
+                      event.key,
+                    )
+                  ) {
+                    void previewCompletionSound(Number(event.currentTarget.value) / 100);
+                  }
+                }}
+              />
+              <div className="sound-volume-scale" aria-hidden="true">
+                <span>Leiser</span>
+                <span>Lauter</span>
+              </div>
+              <button
+                className="sound-preview"
+                type="button"
+                onClick={() => void previewCompletionSound()}
+              >
+                Ton anhören
+              </button>
+              <p className="settings-note sound-preview-status" aria-live="polite">
+                {soundPreviewMessage || "Beim Loslassen des Reglers hörst du die gewählte Lautstärke."}
+              </p>
+            </fieldset>
           </section>
 
           <section className="settings-reminder" aria-labelledby="reminder-title">

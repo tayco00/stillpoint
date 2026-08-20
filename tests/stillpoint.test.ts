@@ -11,6 +11,7 @@ import {
   getWeeklySummary,
   localDateKey,
   normalizeState,
+  normalizeCompletionSoundVolume,
   readPersistedState,
   readPersistedStateFrom,
   reviewLatestSession,
@@ -70,11 +71,19 @@ test("the selected focus duration survives state normalization", () => {
 });
 
 test("display size and completion sound preferences survive normalization", () => {
-  const personalized = normalizeState({ fontScale: "large", completionSound: false });
+  const personalized = normalizeState({
+    fontScale: "large",
+    completionSound: false,
+    completionSoundVolume: 0.35,
+  });
   assert.equal(personalized.fontScale, "large");
   assert.equal(personalized.completionSound, false);
+  assert.equal(personalized.completionSoundVolume, 0.35);
   assert.equal(normalizeState({ fontScale: "huge" }).fontScale, "standard");
   assert.equal(normalizeState({}).completionSound, true);
+  assert.equal(normalizeCompletionSoundVolume(-4), 0.1);
+  assert.equal(normalizeCompletionSoundVolume(4), 1);
+  assert.equal(normalizeCompletionSoundVolume(Number.NaN), 0.65);
 });
 
 test("the completion cue is a gentle ascending three-note chord", () => {

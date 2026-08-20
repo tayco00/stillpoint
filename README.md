@@ -31,6 +31,7 @@ Menschen möglichst lange in der Anwendung halten sollen.
 
 - Fokus-Timer für 25, 45 oder 60 Minuten
 - Sanfter, lokal erzeugter Dreiklang am Ende einer Fokuszeit
+- Profilbezogene Lautstärke mit direkter Tonvorschau in den Einstellungen
 - Frei formulierbares Ziel für die aktuelle Session
 - Pausieren, Fortsetzen und Zurücksetzen mit korrekter Zeitmessung
 - Abschlussdialog für Ergebnis und nächsten guten Schritt
@@ -197,7 +198,7 @@ Ein vollständiges Desktop-Release benötigt genau diese drei Dateien:
 - `Stillpoint-Setup.exe.blockmap`
 - `latest.yml`
 
-Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.4.1`
+Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.4.2`
 veröffentlicht. `latest.yml` und die Blockmap sind notwendig, damit bereits
 installierte Anwendungen das Update erkennen und effizient herunterladen
 können.

@@ -2,6 +2,7 @@ export const STORAGE_KEY = "stillpoint:v1";
 export const STATE_VERSION = 2 as const;
 export const MAX_NOTES = 20;
 export const MAX_SESSION_HISTORY = 180;
+export const DEFAULT_COMPLETION_SOUND_VOLUME = 0.65;
 
 export type EnergyLevel = "low" | "steady" | "high";
 
@@ -49,6 +50,7 @@ export type StillpointState = {
   preferredDuration: 25 | 45 | 60;
   reminder: ReminderPreferences;
   completionSound: boolean;
+  completionSoundVolume: number;
   fontScale: FontScale;
 };
 
@@ -86,6 +88,7 @@ export function createDefaultState(): StillpointState {
     preferredDuration: 25,
     reminder: { enabled: false, intervalMinutes: 60 },
     completionSound: true,
+    completionSoundVolume: DEFAULT_COMPLETION_SOUND_VOLUME,
     fontScale: "standard",
   };
 }
@@ -198,8 +201,18 @@ export function normalizeState(value: unknown): StillpointState {
       intervalMinutes: reminderInterval,
     },
     completionSound: candidate.completionSound !== false,
+    completionSoundVolume: normalizeCompletionSoundVolume(
+      candidate.completionSoundVolume,
+    ),
     fontScale: candidate.fontScale === "large" ? "large" : "standard",
   };
+}
+
+export function normalizeCompletionSoundVolume(value: unknown) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return DEFAULT_COMPLETION_SOUND_VOLUME;
+  }
+  return Math.round(Math.min(1, Math.max(0.1, value)) * 100) / 100;
 }
 
 type ReadableStorage = { getItem: (key: string) => string | null };

@@ -13,6 +13,7 @@ type FocusTimerProps = {
   onDurationChange: (minutes: 25 | 45 | 60) => void;
   initialDuration: number;
   completionSound: boolean;
+  completionSoundVolume: number;
 };
 
 export function FocusTimer({
@@ -22,6 +23,7 @@ export function FocusTimer({
   onDurationChange,
   initialDuration,
   completionSound,
+  completionSoundVolume,
 }: FocusTimerProps) {
   const safeInitialDuration = PRESETS.includes(initialDuration as (typeof PRESETS)[number])
     ? initialDuration
@@ -44,7 +46,7 @@ export function FocusTimer({
         endAt.current = null;
         if (snapshot.shouldComplete) {
           completed.current = true;
-          if (completionSound) playCompletionTone();
+          if (completionSound) playCompletionTone(completionSoundVolume);
           onComplete(duration);
           setMessage(`Stark. ${duration} Minuten Fokus sind für heute verbucht.`);
         }
@@ -54,7 +56,7 @@ export function FocusTimer({
     tick();
     const timer = window.setInterval(tick, 250);
     return () => window.clearInterval(timer);
-  }, [completionSound, duration, isRunning, onComplete]);
+  }, [completionSound, completionSoundVolume, duration, isRunning, onComplete]);
 
   const selectDuration = (minutes: (typeof PRESETS)[number]) => {
     setDuration(minutes);

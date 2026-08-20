@@ -163,7 +163,7 @@ function createMainWindow() {
     if (!isMainSmokeTest && !isShellSmokeTest) return;
     await new Promise((resolve) => setTimeout(resolve, 400));
     const appIsReady = await window.webContents.executeJavaScript(
-      "Boolean(document.title === 'Stillpoint' && document.querySelector('h1')?.textContent?.includes('Weniger') && document.querySelector('#workspace') && document.querySelector('.first-run-dialog[open] #profile-name') && document.querySelector('.settings-trigger') && document.querySelector('.settings-dialog #reminder-enabled') && document.querySelector('.weekly-review') && document.querySelector('.session-history'))",
+      "Boolean(document.title === 'Stillpoint' && document.querySelector('h1')?.textContent?.includes('Weniger') && document.querySelector('#workspace') && document.querySelector('.first-run-dialog[open] #profile-name') && document.querySelector('.settings-trigger') && document.querySelector('.settings-dialog #reminder-enabled') && document.querySelector('.settings-dialog #completion-sound-volume') && document.querySelector('.weekly-review') && document.querySelector('.session-history'))",
     );
     await window.webContents.executeJavaScript(
       "window.stillpointDesktop?.setReminderPreferences({ enabled: true, intervalMinutes: 30 })",

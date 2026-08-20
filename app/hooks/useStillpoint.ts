@@ -9,6 +9,7 @@ import {
   type FontScale,
   localDateKey,
   MAX_NOTES,
+  normalizeCompletionSoundVolume,
   readPersistedStateFrom,
   type ReminderPreferences,
   reviewLatestSession,
@@ -180,6 +181,13 @@ export function useStillpoint() {
     updateActiveState((current) => ({ ...current, completionSound }));
   }, [updateActiveState]);
 
+  const setCompletionSoundVolume = useCallback((completionSoundVolume: number) => {
+    updateActiveState((current) => ({
+      ...current,
+      completionSoundVolume: normalizeCompletionSoundVolume(completionSoundVolume),
+    }));
+  }, [updateActiveState]);
+
   const setFontScale = useCallback((fontScale: FontScale) => {
     updateActiveState((current) => ({ ...current, fontScale }));
   }, [updateActiveState]);
@@ -245,6 +253,7 @@ export function useStillpoint() {
     setEnergy,
     setPreferredDuration,
     setCompletionSound,
+    setCompletionSoundVolume,
     setFontScale,
     addNote,
     removeNote,

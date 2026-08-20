@@ -5,6 +5,10 @@ export const COMPLETION_TONE_NOTES = [
 ] as const;
 
 let audioContext: AudioContext | null = null;
+let activeTone: {
+  master: GainNode;
+  oscillators: OscillatorNode[];
+} | null = null;
 
 function getAudioContext() {
   if (typeof window === "undefined") return null;
@@ -25,18 +29,39 @@ export async function prepareCompletionTone() {
   }
 }
 
-export function playCompletionTone() {
+function stopActiveTone(context: AudioContext) {
+  if (!activeTone) return;
+  const { master, oscillators } = activeTone;
+  const now = context.currentTime;
+  master.gain.cancelScheduledValues(now);
+  master.gain.setValueAtTime(Math.max(0.0001, master.gain.value), now);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+  oscillators.forEach((oscillator) => {
+    try {
+      oscillator.stop(now + 0.04);
+    } catch {
+      // The oscillator may already have reached its scheduled end.
+    }
+  });
+  activeTone = null;
+}
+
+export function playCompletionTone(volume = DEFAULT_COMPLETION_SOUND_VOLUME) {
   const context = getAudioContext();
   if (!context || context.state !== "running") return false;
+  stopActiveTone(context);
   const start = context.currentTime + 0.04;
+  const safeVolume = normalizeCompletionSoundVolume(volume);
   const master = context.createGain();
+  const oscillators: OscillatorNode[] = [];
   master.gain.setValueAtTime(0.0001, start);
-  master.gain.exponentialRampToValueAtTime(0.24, start + 0.08);
+  master.gain.exponentialRampToValueAtTime(0.32 * safeVolume, start + 0.08);
   master.gain.exponentialRampToValueAtTime(0.0001, start + 1.9);
   master.connect(context.destination);
 
   COMPLETION_TONE_NOTES.forEach((note) => {
     const oscillator = context.createOscillator();
+    oscillators.push(oscillator);
     const noteGain = context.createGain();
     const noteStart = start + note.delay;
     oscillator.type = "sine";
@@ -49,5 +74,13 @@ export function playCompletionTone() {
     oscillator.start(noteStart);
     oscillator.stop(noteStart + note.duration + 0.05);
   });
+  activeTone = { master, oscillators };
+  window.setTimeout(() => {
+    if (activeTone?.master === master) activeTone = null;
+  }, 2_100);
   return true;
 }
+import {
+  DEFAULT_COMPLETION_SOUND_VOLUME,
+  normalizeCompletionSoundVolume,
+} from "./stillpoint.ts";

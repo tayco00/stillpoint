@@ -53,7 +53,7 @@ const startupRenderer = await readFile(
 );
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.4.1");
+  assert.equal(packageJson.version, "0.4.2");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -100,8 +100,11 @@ test("adds profile selection, large text, a completion cue, and manual updates",
   assert.match(profileSettings, /Weiteres Profil/);
   assert.match(desktopSettings, /Schriftgröße/);
   assert.match(desktopSettings, /Abschlusston/);
+  assert.match(desktopSettings, /completion-sound-volume/);
+  assert.match(desktopSettings, /Ton anhören/);
   assert.match(desktopSettings, /Nach Updates suchen/);
   assert.match(focusTimer, /playCompletionTone/);
+  assert.match(focusTimer, /completionSoundVolume/);
   assert.match(preload, /stillpoint:check-for-updates/);
   assert.match(preload, /stillpoint:update-status/);
   assert.match(updateService, /checkManually/);
