@@ -28,6 +28,8 @@ test("server-renders the complete Stillpoint product surface", async () => {
   assert.match(html, /Nicht jetzt\. Nicht weg/);
   assert.match(html, /Fortschritt/);
   assert.match(html, /Vergangene Sitzungen/);
+  assert.match(html, /<details class="session-history">/);
+  assert.doesNotMatch(html, /<details class="session-history" open/);
   assert.doesNotMatch(html, /Ein ruhiger Ort für wichtige Arbeit/);
   assert.doesNotMatch(html, /Keine Anmeldung · Deine Daten bleiben auf diesem Gerät/);
   assert.doesNotMatch(html, /Mach nur das\. Für jetzt\./);

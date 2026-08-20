@@ -59,7 +59,8 @@ Menschen möglichst lange in der Anwendung halten sollen.
 - Tagesübersicht für Sessions, Fokusminuten und Atempausen
 - Verlauf der letzten sieben Tage
 - Wochenrückblick mit Fokuszeit, bevorzugter Tageszeit und Energiemuster
-- Sitzungshistorie mit Datum, Dauer, Aufgabe, Energie, Ergebnis und nächstem Schritt
+- Kompakt ausklappbare Sitzungshistorie mit Datum, Dauer, Aufgabe, Energie,
+  Ergebnis und nächstem Schritt
 - Kurze Tagesreflexion
 - Lokales Löschen aller gespeicherten Stillpoint-Daten direkt in der Anwendung
 
@@ -198,7 +199,7 @@ Ein vollständiges Desktop-Release benötigt genau diese drei Dateien:
 - `Stillpoint-Setup.exe.blockmap`
 - `latest.yml`
 
-Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.4.2`
+Sie werden gemeinsam unter einem stabilen Versions-Tag wie `v0.4.3`
 veröffentlicht. `latest.yml` und die Blockmap sind notwendig, damit bereits
 installierte Anwendungen das Update erkennen und effizient herunterladen
 können.

@@ -35,6 +35,10 @@ const focusTimer = await readFile(
   new URL("../app/components/FocusTimer.tsx", import.meta.url),
   "utf8",
 );
+const sessionHistory = await readFile(
+  new URL("../app/components/SessionHistory.tsx", import.meta.url),
+  "utf8",
+);
 const interactiveTools = await readFile(
   new URL("../app/components/InteractiveTools.tsx", import.meta.url),
   "utf8",
@@ -53,7 +57,7 @@ const startupRenderer = await readFile(
 );
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.4.2");
+  assert.equal(packageJson.version, "0.4.3");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");
@@ -109,6 +113,12 @@ test("adds profile selection, large text, a completion cue, and manual updates",
   assert.match(preload, /stillpoint:update-status/);
   assert.match(updateService, /checkManually/);
   assert.match(desktopMain, /stillpoint:install-update/);
+});
+
+test("keeps past sessions in a compact, closed disclosure by default", () => {
+  assert.match(sessionHistory, /<details className="session-history">/);
+  assert.match(sessionHistory, /<summary className="history-summary">/);
+  assert.doesNotMatch(sessionHistory, /<details[^>]+open/);
 });
 
 test("removes offline soundscapes from UI and persisted state", () => {
