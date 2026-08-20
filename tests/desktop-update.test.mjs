@@ -53,7 +53,7 @@ const startupRenderer = await readFile(
 );
 
 test("ships an installable GitHub update channel", () => {
-  assert.equal(packageJson.version, "0.4.0");
+  assert.equal(packageJson.version, "0.4.1");
   assert.equal(packageJson.dependencies["electron-updater"], "^6.8.9");
   assert.equal(packageJson.build.win.target, "nsis");
   assert.equal(packageJson.build.nsis.artifactName, "Stillpoint-Setup.exe");

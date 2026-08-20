@@ -2,6 +2,7 @@
 
 import { getRecentDays, localDateKey, type StillpointState } from "../lib/stillpoint";
 import { WeeklyReview } from "./WeeklyReview";
+import { SessionHistory } from "./SessionHistory";
 
 type RhythmSectionProps = {
   data: StillpointState;
@@ -80,6 +81,7 @@ export function RhythmSection({
         </div>
 
         <WeeklyReview data={data} />
+        <SessionHistory data={data} />
       </div>
 
       <div className="data-promise">

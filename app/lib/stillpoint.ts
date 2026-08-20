@@ -24,6 +24,7 @@ export type SessionRecord = {
   intention: string;
   energy: EnergyLevel | null;
   outcome: string;
+  nextStep: string;
 };
 
 export type ReminderInterval = 30 | 60 | 90 | 120;
@@ -159,6 +160,8 @@ export function normalizeState(value: unknown): StillpointState {
             ? record.energy
             : null,
           outcome: typeof record.outcome === "string" ? record.outcome.slice(0, 300) : "",
+          nextStep:
+            typeof record.nextStep === "string" ? record.nextStep.slice(0, 180) : "",
         }))
     : [];
 
@@ -263,6 +266,7 @@ export function addSession(
     intention: (details.intention ?? "").slice(0, 180),
     energy: details.energy ?? null,
     outcome: "",
+    nextStep: "",
   };
   return {
     ...state,
@@ -291,9 +295,17 @@ export function reviewLatestSession(
     ...state,
     nextStep: cleanNextStep,
     sessionHistory: state.sessionHistory.map((record, index) =>
-      index === latestIndex ? { ...record, outcome: cleanOutcome } : record,
+      index === latestIndex
+        ? { ...record, outcome: cleanOutcome, nextStep: cleanNextStep }
+        : record,
     ),
   };
+}
+
+export function getSessionHistory(state: StillpointState) {
+  return [...state.sessionHistory].sort(
+    (first, second) => second.completedAt - first.completedAt,
+  );
 }
 
 export function addBreathReset(state: StillpointState, date = new Date()) {

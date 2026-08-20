@@ -7,6 +7,7 @@ import {
   ENERGY_RECOMMENDATIONS,
   formatTime,
   getRecentDays,
+  getSessionHistory,
   getWeeklySummary,
   localDateKey,
   normalizeState,
@@ -102,7 +103,29 @@ test("session reviews preserve the next step for the next launch", () => {
   );
   assert.equal(reviewed.nextStep, "Die Einleitung schreiben");
   assert.equal(reviewed.sessionHistory[0].outcome, "Die Struktur steht.");
+  assert.equal(reviewed.sessionHistory[0].nextStep, "Die Einleitung schreiben");
   assert.equal(reviewed.sessionHistory[0].energy, "steady");
+});
+
+test("session history is newest first and preserves each completed event", () => {
+  let state = addSession(
+    createDefaultState(),
+    25,
+    new Date(2026, 7, 14, 9),
+    { intention: "Recherche", energy: "steady" },
+  );
+  state = reviewLatestSession(state, "Quellen gesammelt", "Gliederung schreiben");
+  state = addSession(
+    state,
+    45,
+    new Date(2026, 7, 15, 10),
+    { intention: "Gliederung", energy: "high" },
+  );
+  const history = getSessionHistory(state);
+  assert.equal(history.length, 2);
+  assert.equal(history[0].intention, "Gliederung");
+  assert.equal(history[1].outcome, "Quellen gesammelt");
+  assert.equal(history[1].nextStep, "Gliederung schreiben");
 });
 
 test("weekly review finds the strongest local focus pattern", () => {
